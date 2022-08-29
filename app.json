@@ -4,12 +4,12 @@
 		"slug": "our-app",
 		"version": "1.0.0",
 		"orientation": "portrait",
-		"icon": "./assets/icon.png",
+		"icon": "./assets/icon-2.png",
 		"userInterfaceStyle": "light",
 		"splash": {
-			"image": "./assets/splash.png",
+			"image": "./assets/splash-animate.gif",
 			"resizeMode": "contain",
-			"backgroundColor": "#ffffff"
+			"backgroundColor": "#1E3B81"
 		},
 		"updates": {
 			"fallbackToCacheTimeout": 0
@@ -21,8 +21,9 @@
 		"android": {
 			"adaptiveIcon": {
 				"foregroundImage": "./assets/adaptive-icon.png",
-				"backgroundColor": "#FFFFFF"
-			}
+				"backgroundColor": "#1E3B81"
+			},
+			"package": "com.nextrockt.ourapp"
 		},
 		"web": {
 			"favicon": "./assets/favicon.png"
