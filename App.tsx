@@ -86,26 +86,48 @@ export default function App() {
       {!isLoading && (
         <View style={styles.container}>
           {showConfetti && (
-            <ConfettiCannon
-              count={200}
-              origin={{ x: -10, y: 0 }}
-              autoStartDelay={0}
-              onAnimationEnd={() => setShowConfetti(false)}
-              colors={[
-                "#e67e22",
-                "#2ecc71",
-                "#3498db",
-                "#84AAC2",
-                "#E6D68D",
-                "#F67933",
-                "#42A858",
-                "#4F50A2",
-                "#A86BB7",
-                "#e74c3c",
-                "#1abc9c",
-              ]}
-              fadeOut={true}
-            />
+            <>
+              <ConfettiCannon
+                count={100}
+                origin={{ x: -10, y: 0 }}
+                autoStartDelay={0}
+                onAnimationEnd={() => setShowConfetti(false)}
+                colors={[
+                  "#e67e22",
+                  "#2ecc71",
+                  "#3498db",
+                  "#84AAC2",
+                  "#E6D68D",
+                  "#F67933",
+                  "#42A858",
+                  "#4F50A2",
+                  "#A86BB7",
+                  "#e74c3c",
+                  "#1abc9c",
+                ]}
+                fadeOut={true}
+              />
+              <ConfettiCannon
+                count={200}
+                origin={{ x: 0, y: -10 }}
+                autoStartDelay={100}
+                onAnimationEnd={() => setShowConfetti(false)}
+                colors={[
+                  "#e67e22",
+                  "#2ecc71",
+                  "#3498db",
+                  "#84AAC2",
+                  "#E6D68D",
+                  "#F67933",
+                  "#42A858",
+                  "#4F50A2",
+                  "#A86BB7",
+                  "#e74c3c",
+                  "#1abc9c",
+                ]}
+                fadeOut={true}
+              />
+            </>
           )}
           <Text style={styles.text}>Bebi "{copos}" copos de agua.</Text>
           <Text
