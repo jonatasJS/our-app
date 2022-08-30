@@ -1,26 +1,59 @@
 import React, { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Image, Text, View, Alert, PermissionsAndroid } from "react-native";
+import { StyleSheet, Image, Text, View, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+// import { Camera, CameraType } from "expo-camera";
+import Typist from "react-typist";
 // import * as Notifications from 'expo-notifications';
+import ConfettiCannon from "react-native-confetti-cannon";
 
 export default function App() {
+  // const [hasPermission, setHasPermission] = useState(null);
+  // const [type, setType] = useState(CameraType.back);
   const [copos, setCopos] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
     setTimeout(async () => {
+      if (
+        (await AsyncStorage.getItem("day")) !=
+        String(
+          new Date().getDate() || (await AsyncStorage.getItem("day")) == null
+        )
+      ) {
+        await AsyncStorage.setItem("day", String(new Date().getDate()));
+        await AsyncStorage.setItem("copos", "0");
+        setCopos(0);
+      }
       setCopos(Number(await AsyncStorage.getItem("copos")) || 0);
     }, 1);
     setTimeout(() => {
       setIsLoading(false); // seta o loading para false
     }, 3000);
+    // (async () => {
+    //   const { status } = await Camera.requestCameraPermissionsAsync();
+    //   setHasPermission(status === "granted");
+    // })();
   }, []);
 
   async function addCopo() {
     try {
       setCopos(copos + 1);
-      await AsyncStorage.setItem("copos", `${copos + 1}`, () => '');
+      await AsyncStorage.setItem("copos", `${copos + 1}`, () => {
+        if (copos == 4) {
+          Alert.alert("🎊 Parabéns! 🎉", "Você acaba de beber 5 copos!");
+          return setShowConfetti(true);
+        }
+
+        if (copos == 9) {
+          Alert.alert("🎊 Parabéns! 🎉", "Você acaba de beber 10 copos!");
+          return setShowConfetti(true);
+        }
+
+        setShowConfetti(false);
+        Alert.alert("Parabéns! 🎊", "Mais um copo de água bebido!");
+      });
     } catch {
       Alert.alert("Erro", "Erro ao adicionar copo");
     }
@@ -28,8 +61,15 @@ export default function App() {
 
   async function remoCopos() {
     try {
-      setCopos(0);
-      await AsyncStorage.setItem("copos", `${0}`, () => '');
+      if (copos <= 0)
+        return Alert.alert(
+          "🤨",
+          "Você não bebeu agua hoje!\nAnda, vá beber agua 😉"
+        );
+      setCopos(copos - 1);
+      await AsyncStorage.setItem("copos", `${copos - 1}`, () =>
+        Alert.alert("🤨", "Você removeu um copo de água!")
+      );
     } catch {
       Alert.alert("Erro", "Erro ao remover copos");
     }
@@ -45,21 +85,68 @@ export default function App() {
       )}
       {!isLoading && (
         <View style={styles.container}>
+          {showConfetti && (
+            <ConfettiCannon
+              count={200}
+              origin={{ x: -10, y: 0 }}
+              autoStartDelay={0}
+              onAnimationEnd={() => setShowConfetti(false)}
+              colors={[
+                "#e67e22",
+                "#2ecc71",
+                "#3498db",
+                "#84AAC2",
+                "#E6D68D",
+                "#F67933",
+                "#42A858",
+                "#4F50A2",
+                "#A86BB7",
+                "#e74c3c",
+                "#1abc9c",
+              ]}
+              fadeOut={true}
+            />
+          )}
           <Text style={styles.text}>Bebi "{copos}" copos de agua.</Text>
           <Text
             style={styles.button}
             accessibilityLabel="Beber"
             onPress={addCopo}
           >
-            {"Beber"}
+            Beber
           </Text>
           <Text
             style={styles.button}
-            accessibilityLabel="Limpar"
+            accessibilityLabel="Dis-Beber"
             onPress={remoCopos}
           >
-            Zerar
+            Dis-Beber
           </Text>
+          {/* {!hasPermission ? (
+            <Text style={styles.text}>Sem acesso a camera</Text>
+          ) : (
+            <>
+              <Camera
+                autoFocus
+                type={type}
+                style={styles.camera}
+              />
+              <Text
+                style={styles.button}
+                accessibilityLabel="Trocar camera"
+                onPress={() => {
+                  setType(
+                    type === CameraType.back
+                      ? CameraType.front
+                      : CameraType.back
+                  );
+                }}
+              >
+                Trocar camera
+              </Text>
+            </>
+          )} */}
+
           {/* <Text
             style={styles.button}
             accessibilityLabel="Limpar"
@@ -85,6 +172,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     display: "flex",
+  },
+  camera: {
+    width: 500,
+    height: 500,
   },
   loading: {
     flex: 1,
