@@ -1,33 +1,40 @@
 {
-	"expo": {
-		"name": "Beba água",
-		"slug": "our-app",
-		"version": "1.0.2",
-		"orientation": "portrait",
-		"icon": "./assets/icon-2.png",
-		"userInterfaceStyle": "light",
-		"splash": {
-			"image": "./assets/splash-static.png",
-			"resizeMode": "contain",
-			"backgroundColor": "#1E3B81"
-		},
-		"updates": {
-			"fallbackToCacheTimeout": 1
-		},
-		"assetBundlePatterns": ["**/*"],
-		"ios": {
-			"supportsTablet": true
-		},
-		"android": {
-			"adaptiveIcon": {
-				"foregroundImage": "./assets/icon-2.png",
-				"backgroundColor": "#1E3B81"
-			},
-			"versionCode": 1,
-			"package": "com.nextrockt.ourapp"
-		},
-		"web": {
-			"favicon": "./assets/icon-2.png"
-		}
-	}
+  "expo": {
+    "name": "Beba água",
+    "slug": "our-app",
+    "version": "1.0.2",
+    "orientation": "portrait",
+    "icon": "./assets/icon-2.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash-static.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1E3B81"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 1
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon-2.png",
+        "backgroundColor": "#1E3B81"
+      },
+      "versionCode": 1,
+      "package": "com.nextrockt.ourapp"
+    },
+    "web": {
+      "favicon": "./assets/icon-2.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "d3ea7596-ed6f-4259-9cc1-08cc033cb516"
+      }
+    }
+  }
 }

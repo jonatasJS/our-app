@@ -68,7 +68,7 @@ export default function App() {
       if (copos <= 0)
         return Alert.alert(
           "🤨",
-          "Você não bebeu agua hoje!\nAnda, vá beber agua 😉"
+          "Você não bebeu água hoje!\nAnda, vá beber água 😉"
         );
       setCopos(copos - 1);
       await AsyncStorage.setItem("copos", `${copos - 1}`, () =>
@@ -133,7 +133,7 @@ export default function App() {
               />
             </>
           )}
-          <Text style={styles.text}>Bebi "{copos}" copos de agua.</Text>
+          <Text style={styles.text}>Bebi "{copos}" copos de água.</Text>
           <Text
             style={styles.button}
             accessibilityLabel="Beber"
