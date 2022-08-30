@@ -1,18 +1,18 @@
 {
 	"expo": {
-		"name": "our-app",
+		"name": "Beba água",
 		"slug": "our-app",
-		"version": "1.0.0",
+		"version": "1.0.2",
 		"orientation": "portrait",
 		"icon": "./assets/icon-2.png",
 		"userInterfaceStyle": "light",
 		"splash": {
-			"image": "./assets/splash-animate.gif",
+			"image": "./assets/splash-static.png",
 			"resizeMode": "contain",
 			"backgroundColor": "#1E3B81"
 		},
 		"updates": {
-			"fallbackToCacheTimeout": 0
+			"fallbackToCacheTimeout": 1
 		},
 		"assetBundlePatterns": ["**/*"],
 		"ios": {
@@ -20,13 +20,14 @@
 		},
 		"android": {
 			"adaptiveIcon": {
-				"foregroundImage": "./assets/adaptive-icon.png",
+				"foregroundImage": "./assets/icon-2.png",
 				"backgroundColor": "#1E3B81"
 			},
+			"versionCode": 1,
 			"package": "com.nextrockt.ourapp"
 		},
 		"web": {
-			"favicon": "./assets/favicon.png"
+			"favicon": "./assets/icon-2.png"
 		}
 	}
 }
