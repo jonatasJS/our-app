@@ -51,6 +51,10 @@ export default function App() {
           return setShowConfetti(true);
         }
 
+        if (copos == 14) {
+          return Alert.alert("😲 MANO", "Para, 15 copos é exagerado!");
+        }
+
         setShowConfetti(false);
         Alert.alert("Parabéns! 🎊", "Mais um copo de água bebido!");
       });
