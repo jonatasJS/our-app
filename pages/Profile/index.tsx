@@ -24,6 +24,8 @@ interface DataTypes {
   company: string;
   location: string;
   blog: string;
+  following: number;
+  followers: number;
 }
 
 export default function ProfileScreen() {
@@ -43,7 +45,9 @@ export default function ProfileScreen() {
         <View
           style={{
             flexDirection: "row",
-            marginTop: 50,
+            justifyContent: "center",
+            alignItems: "center",
+            marginTop: 30,
           }}
         >
           <Avatar.Image
@@ -54,32 +58,62 @@ export default function ProfileScreen() {
           ></Avatar.Image>
           <View
             style={{
-              marginLeft: 20,
+              marginLeft: 170,
+              
+              flexDirection: "row",
+              alignContent: "center",
+              alignItems: "center"
             }}
           >
-            <Title
-              style={{
-                marginTop: 10,
-                marginBottom: 5,
-                fontSize: 24,
-                fontWeight: "bold",
-                color: "#fff",
-              }}
-            >
-              {data.name}
-            </Title>
-            <Caption
-              style={{
-                fontSize: 14,
-                color: "#fff",
-                lineHeight: 14,
-                fontWeight: "bold",
-              }}
-            >
-              @{data.login}
-            </Caption>
+            <TextStyle>
+              {data.followers+"\n"}
+              <Caption
+                style={{
+                  fontSize: 14,
+                  color: "#fff",
+                  lineHeight: 14,
+                  fontWeight: "bold",
+                }}
+              >
+                Seguidores
+              </Caption>
+            </TextStyle>
+            <TextStyle>
+              {data.following+"\n"}
+              <Caption
+                style={{
+                  fontSize: 14,
+                  color: "#fff",
+                  lineHeight: 14,
+                  fontWeight: "bold",
+                }}
+              >
+                Seguindo
+              </Caption>
+            </TextStyle>
           </View>
         </View>
+        <Title
+          style={{
+            marginTop: 10,
+            marginBottom: 5,
+            fontSize: 24,
+            fontWeight: "bold",
+            color: "#fff",
+          }}
+        >
+          {data.name}
+        </Title>
+        <Caption
+          style={{
+            fontSize: 14,
+            color: "#fff",
+            lineHeight: 14,
+            fontWeight: "bold",
+          }}
+        >
+          @{data.login}
+        </Caption>
         <Title
           style={{
             marginTop: 10,

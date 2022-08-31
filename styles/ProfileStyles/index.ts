@@ -6,11 +6,13 @@ export const ProfileStyle = styled.SafeAreaView`
 `;
 
 export const UserInfoSection = styled.View`
-    margin-bottom: 25px;
+    margin-top: 50px;
+    align-items: flex-start;
+    justify-content: center;
 `;
 
 export const TextStyle = styled.Text`
-  font-size: 30px;
+  font-size: 15;
   color: #fff;
   text-align: center;
 `;
