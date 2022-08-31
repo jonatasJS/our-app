@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ConfettiCannon from "react-native-confetti-cannon";
+import { StatusBar } from "expo-status-bar";
 
 export default function HomeScreen() {
   const [copos, setCopos] = useState(0);
@@ -50,7 +51,7 @@ export default function HomeScreen() {
         }
 
         if (copos == 9) {
-          Alert.alert("🎊 Parabéns! 🎉", "Você acaba de beber 10 copos!");
+          Alert.alert("🎊 Parabéns! 🎉", "Você acaba de beber 10 copos!", );
           return setShowConfetti(true);
         }
 
@@ -84,42 +85,60 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-          {showConfetti && (
-            <>
-              <ConfettiCannon
-                count={50}
-                origin={{ x: -10, y: 0 }}
-                autoStartDelay={0}
-                onAnimationEnd={() => setShowConfetti(false)}
-                colors={color}
-                fadeOut={true}
-              />
-              <ConfettiCannon
-                count={50}
-                origin={{ x: 0, y: -10 }}
-                autoStartDelay={100}
-                onAnimationEnd={() => setShowConfetti(false)}
-                colors={color}
-                fadeOut={true}
-              />
-            </>
-          )}
-          <Text style={styles.text}>Bebi "{copos}" copos de água.</Text>
-          <Text
-            style={styles.button}
-            accessibilityLabel="Beber"
-            onPress={addCopo}
-          >
-            Beber
-          </Text>
-          <Text
-            style={styles.button}
-            accessibilityLabel="Dis-Beber"
-            onPress={remoCopos}
-          >
-            Dis-Beber
-          </Text>
-        </View>
+      {showConfetti && (
+        <>
+          <ConfettiCannon
+            count={50}
+            origin={{ x: -10, y: 0 }}
+            autoStartDelay={0}
+            onAnimationEnd={() => setShowConfetti(false)}
+            colors={color}
+            fadeOut={true}
+          />
+          <ConfettiCannon
+            count={50}
+            origin={{ x: 0, y: -10 }}
+            autoStartDelay={100}
+            onAnimationEnd={() => setShowConfetti(false)}
+            colors={color}
+            fadeOut={true}
+          />
+        </>
+      )}
+      <Text style={styles.text}>Bebi "{copos}" copos de água.</Text>
+      <Text style={styles.button} accessibilityLabel="Beber" onPress={addCopo}>
+        Beber
+      </Text>
+      <Text
+        style={styles.button}
+        accessibilityLabel="Dis-Beber"
+        onPress={remoCopos}
+      >
+        Dis-Beber
+      </Text>
+
+      <Text
+        style={styles.button}
+        accessibilityLabel="Zerar"
+        onPress={() => {
+          Alert.alert("Zerar 😲", "Você quer zerar o contador de copos de água!", [
+            { text: "Cancelar", onPress: () => console.log("Cancelar") },
+            {
+              text: "Confirmar",
+              onPress: async () => {
+                await AsyncStorage.setItem("copos", "0");
+                setCopos(0);
+              },
+            },
+          ]);
+        }}
+      >
+        Zerar
+      </Text>
+      
+
+      <StatusBar style="light" />
+    </View>
   );
 }
 

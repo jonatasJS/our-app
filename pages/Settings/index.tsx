@@ -7,7 +7,7 @@ export default function SettingsScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="auto" />
+      <StatusBar style="light" />
       <Text style={styles.text}>Ainda não sei o que fazer aqui...{'\n'}:/</Text>
     </View>
   );

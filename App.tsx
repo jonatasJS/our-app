@@ -94,8 +94,6 @@ export default function App() {
           }}
         />
       </Tab.Navigator>}
-
-      <StatusBar style="light" />
     </NavigationContainer>
   );
 }

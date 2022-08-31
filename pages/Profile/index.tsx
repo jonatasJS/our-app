@@ -7,7 +7,7 @@ export default function ProfileScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="auto" />
+      <StatusBar style="light" />
       <Text style={styles.text}>Profile</Text>
     </View>
   );
