@@ -1,238 +1,104 @@
 import React, { useEffect, useState } from "react";
+import { View, Image, Text, StyleSheet } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Image, Text, View, Alert } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-// import { Camera, CameraType } from "expo-camera";
-import Typist from "react-typist";
-// import * as Notifications from 'expo-notifications';
-import ConfettiCannon from "react-native-confetti-cannon";
+
+const Tab = createBottomTabNavigator();
+
+import HomeScreen from "./pages/Home/index";
+import ProfileScreen from "./pages/Profile/index";
+import SettingsScreen from "./pages/Settings/index";
 
 export default function App() {
-  // const [hasPermission, setHasPermission] = useState(null);
-  // const [type, setType] = useState(CameraType.back);
-  const [copos, setCopos] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
-    setTimeout(async () => {
-      if (
-        (await AsyncStorage.getItem("day")) !=
-        String(
-          new Date().getDate() || (await AsyncStorage.getItem("day")) == null
-        )
-      ) {
-        await AsyncStorage.setItem("day", String(new Date().getDate()));
-        await AsyncStorage.setItem("copos", "0");
-        setCopos(0);
-      }
-      setCopos(Number(await AsyncStorage.getItem("copos")) || 0);
-    }, 1);
     setTimeout(() => {
       setIsLoading(false); // seta o loading para false
     }, 3000);
-    // (async () => {
-    //   const { status } = await Camera.requestCameraPermissionsAsync();
-    //   setHasPermission(status === "granted");
-    // })();
   }, []);
 
-  async function addCopo() {
-    try {
-      setCopos(copos + 1);
-      await AsyncStorage.setItem("copos", `${copos + 1}`, () => {
-        if (copos == 4) {
-          Alert.alert("🎊 Parabéns! 🎉", "Você acaba de beber 5 copos!");
-          return setShowConfetti(true);
-        }
-
-        if (copos == 9) {
-          Alert.alert("🎊 Parabéns! 🎉", "Você acaba de beber 10 copos!");
-          return setShowConfetti(true);
-        }
-
-        if (copos == 14) {
-          return Alert.alert("😲 MANO", "Para, 15 copos é exagerado!");
-        }
-
-        setShowConfetti(false);
-        Alert.alert("Parabéns! 🎊", "Mais um copo de água bebido!");
-      });
-    } catch {
-      Alert.alert("Erro", "Erro ao adicionar copo");
-    }
-  }
-
-  async function remoCopos() {
-    try {
-      if (copos <= 0)
-        return Alert.alert(
-          "🤨",
-          "Você não bebeu água hoje!\nAnda, vá beber água 😉"
-        );
-      setCopos(copos - 1);
-      await AsyncStorage.setItem("copos", `${copos - 1}`, () =>
-        Alert.alert("🤨", "Você removeu um copo de água!")
-      );
-    } catch {
-      Alert.alert("Erro", "Erro ao remover copos");
-    }
-  }
-
   return (
-    <>
+    <NavigationContainer>
       {isLoading && (
         <View style={styles.loading}>
           <Image source={require("./assets/splash-animate.gif")} />
           <Text style={styles.loadingText}>Carregando...</Text>
         </View>
       )}
-      {!isLoading && (
-        <View style={styles.container}>
-          {showConfetti && (
-            <>
-              <ConfettiCannon
-                count={100}
-                origin={{ x: -10, y: 0 }}
-                autoStartDelay={0}
-                onAnimationEnd={() => setShowConfetti(false)}
-                colors={[
-                  "#e67e22",
-                  "#2ecc71",
-                  "#3498db",
-                  "#84AAC2",
-                  "#E6D68D",
-                  "#F67933",
-                  "#42A858",
-                  "#4F50A2",
-                  "#A86BB7",
-                  "#e74c3c",
-                  "#1abc9c",
-                ]}
-                fadeOut={true}
-              />
-              <ConfettiCannon
-                count={200}
-                origin={{ x: 0, y: -10 }}
-                autoStartDelay={100}
-                onAnimationEnd={() => setShowConfetti(false)}
-                colors={[
-                  "#e67e22",
-                  "#2ecc71",
-                  "#3498db",
-                  "#84AAC2",
-                  "#E6D68D",
-                  "#F67933",
-                  "#42A858",
-                  "#4F50A2",
-                  "#A86BB7",
-                  "#e74c3c",
-                  "#1abc9c",
-                ]}
-                fadeOut={true}
-              />
-            </>
-          )}
-          <Text style={styles.text}>Bebi "{copos}" copos de água.</Text>
-          <Text
-            style={styles.button}
-            accessibilityLabel="Beber"
-            onPress={addCopo}
-          >
-            Beber
-          </Text>
-          <Text
-            style={styles.button}
-            accessibilityLabel="Dis-Beber"
-            onPress={remoCopos}
-          >
-            Dis-Beber
-          </Text>
-          {/* {!hasPermission ? (
-            <Text style={styles.text}>Sem acesso a camera</Text>
-          ) : (
-            <>
-              <Camera
-                autoFocus
-                type={type}
-                style={styles.camera}
-              />
-              <Text
-                style={styles.button}
-                accessibilityLabel="Trocar camera"
-                onPress={() => {
-                  setType(
-                    type === CameraType.back
-                      ? CameraType.front
-                      : CameraType.back
-                  );
-                }}
-              >
-                Trocar camera
-              </Text>
-            </>
-          )} */}
+      {!isLoading && <Tab.Navigator
+        initialRouteName="Home"
+        screenOptions={{
+          tabBarShowLabel: false,
+          tabBarStyle: {
+            position: 'absolute',
+            borderTopWidth: 0,
 
-          {/* <Text
-            style={styles.button}
-            accessibilityLabel="Limpar"
-            onPress={async () => {
-              console.log("Sobre", await AsyncStorage.getItem("copos"))
-              console.log("Sobre", copos)
-              Alert.alert("Sobre", "Sobre o app");
-            }}
-          >
-            TESTE
-          </Text> */}
-          <StatusBar style="light" />
-        </View>
-      )}
-    </>
+            bottom: 14,
+            left: 14,
+            right: 14,
+            elevation: 0,
+            borderRadius: 50,
+            height: 60
+          }
+        }}
+       >
+        <Tab.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{
+            headerShown: false,
+            tabBarIcon: ({ color, size, focused }) => {
+              if (focused)
+                return <Ionicons name="ios-home" size={size} color={color} />;
+              return (
+                <Ionicons name="ios-home-outline" size={size} color={color} />
+              );
+            },
+          }}
+        />
+        <Tab.Screen
+          name="Settings"
+          component={SettingsScreen}
+          options={{
+            headerShown: false,
+            tabBarIcon: ({ color, size, focused }) => {
+              if (focused)
+                return (
+                  <Ionicons name="ios-settings" size={size} color={color} />
+                );
+              return (
+                <Ionicons
+                  name="ios-settings-outline"
+                  size={size}
+                  color={color}
+                />
+              );
+            },
+          }}
+        />
+        <Tab.Screen
+          name="Profile"
+          component={ProfileScreen}
+          options={{
+            headerShown: false,
+            tabBarIcon: ({ color, size, focused }) => {
+              if (focused)
+                return <Ionicons name="ios-person" size={size} color={color} />;
+              return (
+                <Ionicons name="ios-person-outline" size={size} color={color} />
+              );
+            },
+          }}
+        />
+      </Tab.Navigator>}
+
+      <StatusBar style="light" />
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#1E3B81",
-    alignItems: "center",
-    justifyContent: "center",
-    display: "flex",
-  },
-  camera: {
-    width: 500,
-    height: 500,
-  },
-  loading: {
-    flex: 1,
-    backgroundColor: "#1E3B81",
-    alignItems: "center",
-    justifyContent: "center",
-    display: "flex",
-  },
-  loadingText: {
-    color: "#fff",
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  text: {
-    fontSize: 30,
-    color: "#fff",
-  },
-  button: {
-    fontSize: 30,
-    margin: 50,
-    paddingBottom: 20,
-    paddingTop: 20,
-    paddingLeft: 40,
-    paddingRight: 40,
-    color: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-    display: "flex",
-    backgroundColor: "#1f9ace",
-  },
-});
 
 /*
 
@@ -287,3 +153,20 @@ export default function App() {
 }
 
 */
+
+const styles = StyleSheet.create({
+  loading: {
+    flex: 1,
+    backgroundColor: "#1E3B81",
+    alignItems: "center",
+    justifyContent: "center",
+    display: "flex",
+    textAlign: "center",
+  },
+  loadingText: {
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center",
+  }
+});
