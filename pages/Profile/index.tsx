@@ -59,7 +59,6 @@ export default function ProfileScreen() {
           <View
             style={{
               marginLeft: 170,
-              
               flexDirection: "row",
               alignContent: "center",
               alignItems: "center"
