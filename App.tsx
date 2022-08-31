@@ -3,6 +3,7 @@ import { View, Image, Text, StyleSheet } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
+import * as Updates from "expo-updates";
 
 const Tab = createBottomTabNavigator();
 
@@ -17,6 +18,15 @@ export default function App() {
     setTimeout(() => {
       setIsLoading(false); // seta o loading para false
     }, 3000);
+    async function up() {
+      const { isAvailable } = await Updates.checkForUpdateAsync();
+      if (isAvailable) {
+        await Updates.fetchUpdateAsync();
+        await Updates.reloadAsync();
+      }
+    }
+
+    up();
   }, []);
 
   return (
