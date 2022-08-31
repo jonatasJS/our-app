@@ -38,7 +38,7 @@ export default function App() {
         </View>
       )}
       {!isLoading && <Tab.Navigator
-        initialRouteName="Profile"
+        initialRouteName="Home"
         screenOptions={{
           tabBarShowLabel: false,
           tabBarStyle: {
