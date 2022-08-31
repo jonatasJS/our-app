@@ -3,7 +3,6 @@ import { View, Image, Text, StyleSheet } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
-import { StatusBar } from "expo-status-bar";
 
 const Tab = createBottomTabNavigator();
 
@@ -29,7 +28,7 @@ export default function App() {
         </View>
       )}
       {!isLoading && <Tab.Navigator
-        initialRouteName="Home"
+        initialRouteName="Profile"
         screenOptions={{
           tabBarShowLabel: false,
           tabBarStyle: {
