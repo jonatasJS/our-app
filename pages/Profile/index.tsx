@@ -39,8 +39,7 @@ export default function ProfileScreen() {
 
   return (
     <ProfileStyle>
-      <UserInfoSection
-      >
+      <UserInfoSection>
         <View
           style={{
             flexDirection: "row",
@@ -55,26 +54,43 @@ export default function ProfileScreen() {
           ></Avatar.Image>
           <View
             style={{
-              marginLeft: 20
+              marginLeft: 20,
             }}
           >
-            <Title style={{
-              marginTop: 10,
-              marginBottom: 5,
-              fontSize: 24,
-              fontWeight: "bold",
-              color: '#fff'
-            }}>{data.name}</Title>
+            <Title
+              style={{
+                marginTop: 10,
+                marginBottom: 5,
+                fontSize: 24,
+                fontWeight: "bold",
+                color: "#fff",
+              }}
+            >
+              {data.name}
+            </Title>
             <Caption
               style={{
                 fontSize: 14,
-                color: '#fff',
+                color: "#fff",
                 lineHeight: 14,
-                fontWeight: 'bold'
+                fontWeight: "bold",
               }}
-            >@{data.login}</Caption>
+            >
+              @{data.login}
+            </Caption>
           </View>
         </View>
+        <Title
+          style={{
+            marginTop: 10,
+            marginBottom: 5,
+            fontSize: 14,
+            fontWeight: "bold",
+            color: "#fff",
+          }}
+        >
+          {data.bio}
+        </Title>
       </UserInfoSection>
       <StatusBar style="light" />
     </ProfileStyle>
