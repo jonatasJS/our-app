@@ -9,7 +9,8 @@
     "web": "expo start --web",
     "pk-update": "yarn-upgrade-all",
     "build:android": "expo build:android",
-    "build:ios": "expo build:ios"
+    "build:ios": "expo build:ios",
+    "up:app": "expo publish"
   },
   "dependencies": {
     "@draftbit/ui": "^46.2.0",
@@ -22,7 +23,8 @@
     "@types/react-native": "^0.69.6",
     "expo": "^46.0.9",
     "expo-camera": "^12.3.0",
-    "expo-notifications": "^0.16.1",
+    "expo-device": "^4.3.0",
+    "expo-notifications": "~0.16.1",
     "expo-status-bar": "^1.4.0",
     "expo-updates": "^0.14.5",
     "moment": "^2.29.4",

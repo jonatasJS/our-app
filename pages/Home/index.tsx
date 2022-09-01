@@ -4,13 +4,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { StatusBar } from "expo-status-bar";
 import * as Progress from "react-native-progress";
+import * as Notifications from 'expo-notifications';
 // import { TextInput } from "react-native-paper";
 
 import {
   ButtonsContainerStyle,
   ButtonStyle,
   HomeStyle,
-  ProgressStyle,
   TextStyle,
 } from "../../styles/HomeStyles";
 import { Button } from "react-native-paper";
@@ -48,7 +48,14 @@ export default function HomeScreen() {
         await AsyncStorage.setItem("copos", "0");
         setCopos(0);
       }
+      if (
+        await AsyncStorage.getItem("ml") == ('' || null || undefined) ||
+        await AsyncStorage.getItem("peso") == ('' || null || undefined)
+      ) return setShowContainer(false);
+      
       setCopos(Number(await AsyncStorage.getItem("copos")) || 0);
+      setPeso(await AsyncStorage.getItem("peso") || "0");
+      setMl(await AsyncStorage.getItem("ml") || "0");
     }, 1);
     // (async () => {
     //   const { status } = await Camera.requestCameraPermissionsAsync();
@@ -60,14 +67,32 @@ export default function HomeScreen() {
     try {
       setCopos(copos + 1);
       setTotalMl(totalMl + Number(ml));
-      await AsyncStorage.setItem("copos", `${copos + 1}`, () => {
+      await AsyncStorage.setItem("copos", `${copos + 1}`, async () => {
         if (copos == 4) {
           Alert.alert("🎊 Parabéns! 🎉", "Você acaba de beber 5 copos!");
+          await Notifications.scheduleNotificationAsync({
+            content: {
+              title: "🎊 Parabéns! 🎉",
+              body: "Você acaba de beber 5 copos!",
+              sound: "../../assets/notification-sound.mp3",
+            },
+            trigger: { seconds: 1 },
+          });
+          
           return setShowConfetti(true);
         }
 
         if (copos == 9) {
           Alert.alert("🎊 Parabéns! 🎉", "Você acaba de beber 10 copos!");
+          await Notifications.scheduleNotificationAsync({
+            content: {
+              title: "🎊 Parabéns! 🎉",
+              body: "Você acaba de beber 10 copos!",
+              sound: "../../assets/notification-sound.mp3",
+            },
+            trigger: { seconds: 1 },
+            
+          });
           return setShowConfetti(true);
         }
 
@@ -102,7 +127,7 @@ export default function HomeScreen() {
 
   return (
     <HomeStyle>
-      {!showContainer && <>
+      {showContainer && <>
         <TextInput
           autoFocus
           // placeholder="Seu pezo..."
@@ -149,7 +174,7 @@ export default function HomeScreen() {
           Teste
         </Button>
       </>}
-      {showContainer && (
+      {!showContainer && (
         <>
           {showConfetti && (
             <>
@@ -171,11 +196,11 @@ export default function HomeScreen() {
               />
             </>
           )}
-          <TextStyle>Seu peso {peso} kg</TextStyle>
+          {/* <TextStyle>Seu peso {peso} kg</TextStyle>
           <TextStyle>Seu copo tem {ml} ml</TextStyle>
-          <TextStyle>Você tem q beber {(Number(peso)*35).toFixed(2)} litros</TextStyle>
+          <TextStyle>Você tem q beber {(Number(peso)*35).toFixed(2)} litros</TextStyle> */}
           <TextStyle>Bebi "{copos}" copos de água.</TextStyle>
-          <TextStyle>Bebi "{totalMl}" ml de água.</TextStyle>
+          {/* <TextStyle>Bebi "{totalMl}" ml de água.</TextStyle> */}
 
           <Progress.Circle
             style={{
@@ -210,7 +235,9 @@ export default function HomeScreen() {
                       text: "Confirmar",
                       onPress: async () => {
                         await AsyncStorage.setItem("copos", "0");
+                        await AsyncStorage.setItem("totalMl", "0");
                         setCopos(0);
+                        setTotalMl(0);
                       },
                     },
                   ]

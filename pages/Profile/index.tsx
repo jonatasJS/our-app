@@ -1,7 +1,7 @@
 // Pagina de perfil
 import React, { useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
-import { Image, View } from "react-native";
+import { Image, Linking, View } from "react-native";
 import {
   Avatar,
   Title,
@@ -93,6 +93,7 @@ export default function ProfileScreen() {
           </View>
         </View>
         <Title
+          onPress={async () => await Linking.openURL(data.blog)}
           style={{
             marginTop: 10,
             marginBottom: 5,
@@ -110,6 +111,7 @@ export default function ProfileScreen() {
             lineHeight: 14,
             fontWeight: "bold",
           }}
+          onPress={async () => await Linking.openURL(data.blog)}
         >
           @{data.login}
         </Caption>
