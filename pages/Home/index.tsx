@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Alert, TextInput, Text } from "react-native";
+import { Alert, TextInput, Text, Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { StatusBar } from "expo-status-bar";
 import * as Progress from "react-native-progress";
 import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
 // import { TextInput } from "react-native-paper";
 
 import {
@@ -57,6 +58,12 @@ export default function HomeScreen() {
       setPeso(await AsyncStorage.getItem("peso") || "0");
       setMl(await AsyncStorage.getItem("ml") || "0");
     }, 1);
+
+    (async () => await registerForPushNotificationsAsync().then(token => {
+      console.clear();
+      console.log(new Date())
+      console.log(token)
+    }))();
     // (async () => {
     //   const { status } = await Camera.requestCameraPermissionsAsync();
     //   setHasPermission(status === "granted");
@@ -76,7 +83,7 @@ export default function HomeScreen() {
               body: "Você acaba de beber 5 copos!",
               sound: true,
             },
-            trigger: { seconds: 1 },
+            trigger: null,
           });
           
           return setShowConfetti(true);
@@ -90,7 +97,7 @@ export default function HomeScreen() {
               body: "Você acaba de beber 10 copos!",
               sound: true,
             },
-            trigger: { seconds: 1 },
+            trigger: null,
             
           });
           return setShowConfetti(true);
@@ -253,6 +260,35 @@ export default function HomeScreen() {
       )}
     </HomeStyle>
   );
+}
+
+async function registerForPushNotificationsAsync() {
+  if (Device.isDevice) {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') {
+      alert('Failed to get push token for push notification!');
+      return;
+    }
+    const token = (await Notifications.getExpoPushTokenAsync()).data;
+    console.log(token);
+    this.setState({ expoPushToken: token });
+  } else {
+    alert('Must use physical device for Push Notifications');
+  }
+
+  if (Platform.OS === 'android') {
+    Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#FF231F7C',
+    });
+  }
 }
 
 /*
