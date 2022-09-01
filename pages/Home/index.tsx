@@ -74,7 +74,7 @@ export default function HomeScreen() {
             content: {
               title: "🎊 Parabéns! 🎉",
               body: "Você acaba de beber 5 copos!",
-              sound: "../../assets/notification-sound.mp3",
+              sound: true,
             },
             trigger: { seconds: 1 },
           });
@@ -88,7 +88,7 @@ export default function HomeScreen() {
             content: {
               title: "🎊 Parabéns! 🎉",
               body: "Você acaba de beber 10 copos!",
-              sound: "../../assets/notification-sound.mp3",
+              sound: true,
             },
             trigger: { seconds: 1 },
             
