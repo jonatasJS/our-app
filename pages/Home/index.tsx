@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { TouchableOpacity, Alert, View, Text } from "react-native";
+import { Alert, TextInput, Text } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { StatusBar } from "expo-status-bar";
-import * as Progress from 'react-native-progress';
+import * as Progress from "react-native-progress";
+// import { TextInput } from "react-native-paper";
 
 import {
   ButtonsContainerStyle,
@@ -12,10 +13,15 @@ import {
   ProgressStyle,
   TextStyle,
 } from "../../styles/HomeStyles";
+import { Button } from "react-native-paper";
 
 export default function HomeScreen() {
   const [copos, setCopos] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [peso, setPeso] = useState("62" || null);
+  const [ml, setMl] = useState("250" || null);
+  const [totalMl, setTotalMl] = useState(0);
+  const [showContainer, setShowContainer] = useState(false);
   const color = [
     "#e67e22",
     "#2ecc71",
@@ -53,6 +59,7 @@ export default function HomeScreen() {
   async function addCopo() {
     try {
       setCopos(copos + 1);
+      setTotalMl(totalMl + Number(ml));
       await AsyncStorage.setItem("copos", `${copos + 1}`, () => {
         if (copos == 4) {
           Alert.alert("🎊 Parabéns! 🎉", "Você acaba de beber 5 copos!");
@@ -84,6 +91,7 @@ export default function HomeScreen() {
           "Você não bebeu água hoje!\nAnda, vá beber água 😉"
         );
       setCopos(copos - 1);
+      setTotalMl(totalMl - Number(ml));
       await AsyncStorage.setItem("copos", `${copos - 1}`, () =>
         Alert.alert("🤨", "Você removeu um copo de água!")
       );
@@ -94,70 +102,128 @@ export default function HomeScreen() {
 
   return (
     <HomeStyle>
-      {showConfetti && (
-        <>
-          <ConfettiCannon
-            count={50}
-            origin={{ x: -10, y: 0 }}
-            autoStartDelay={0}
-            onAnimationEnd={() => setShowConfetti(false)}
-            colors={color}
-            fadeOut={true}
-          />
-          <ConfettiCannon
-            count={50}
-            origin={{ x: 0, y: -10 }}
-            autoStartDelay={100}
-            onAnimationEnd={() => setShowConfetti(false)}
-            colors={color}
-            fadeOut={true}
-          />
-        </>
-      )}
-      <TextStyle>Bebi "{copos}" copos de água.</TextStyle>
-
-      <Progress.Circle
-        style={{
-          marginTop: 20,
-        }}
-        progress={((copos / 10) * 100)/100}
-        size={120}
-        thickness={10}
-        showsText={true}
-      />
-
-        <ButtonStyle accessibilityLabel="Beber" onPress={addCopo}>
-          <TextStyle>Beber</TextStyle>
-        </ButtonStyle>
-      <ButtonsContainerStyle>
-        <ButtonStyle accessibilityLabel="Retirar" onPress={remoCopos}>
-          <TextStyle>Retirar</TextStyle>
-        </ButtonStyle>
-
-        <ButtonStyle
-          accessibilityLabel="Zerar"
-          onPress={() => {
-            Alert.alert(
-              "Zerar 😲",
-              "Você quer zerar o contador de copos de água!",
-              [
-                { text: "Cancelar", onPress: () => console.log("Cancelar") },
-                {
-                  text: "Confirmar",
-                  onPress: async () => {
-                    await AsyncStorage.setItem("copos", "0");
-                    setCopos(0);
-                  },
-                },
-              ]
-            );
+      {!showContainer && <>
+        <TextInput
+          autoFocus
+          // placeholder="Seu pezo..."
+          style={{
+            backgroundColor: "#00000050",
+            width: "80%",
+            color: "#fff",
+            marginBottom: 10,
+            borderRadius: 10,
+            padding: 20,
+          }}
+          value={peso}
+          onChangeText={(text) => setPeso(text)}
+        ></TextInput>
+        <TextInput
+          // placeholder="Seu pezo..."
+          style={{
+            backgroundColor: "#00000050",
+            width: "80%",
+            color: "#fff",
+            marginBottom: 10,
+            borderRadius: 10,
+            padding: 20,
+          }}
+          value={ml}
+          onChangeText={(text) => setMl(text)}
+        ></TextInput>
+        <Button
+          style={{
+            backgroundColor: "#3498db",
+            width: "80%",
+            marginBottom: 10,
+            borderRadius: 10,
+            padding: 20,
+          }}
+          mode="outlined"
+          onPress={async () => {
+            if (peso == null) return Alert.alert("Peso inválido!");
+            Alert.alert("Peso salvo com sucesso!");
+            await AsyncStorage.setItem("peso", peso);
+            setShowContainer(true);
           }}
         >
-          <TextStyle>Zerar</TextStyle>
-        </ButtonStyle>
-      </ButtonsContainerStyle>
+          Teste
+        </Button>
+      </>}
+      {showContainer && (
+        <>
+          {showConfetti && (
+            <>
+              <ConfettiCannon
+                count={50}
+                origin={{ x: -10, y: 0 }}
+                autoStartDelay={0}
+                onAnimationEnd={() => setShowConfetti(false)}
+                colors={color}
+                fadeOut={true}
+              />
+              <ConfettiCannon
+                count={50}
+                origin={{ x: 0, y: -10 }}
+                autoStartDelay={100}
+                onAnimationEnd={() => setShowConfetti(false)}
+                colors={color}
+                fadeOut={true}
+              />
+            </>
+          )}
+          <TextStyle>Seu peso {peso} kg</TextStyle>
+          <TextStyle>Seu copo tem {ml} ml</TextStyle>
+          <TextStyle>Você tem q beber {(Number(peso)*35).toFixed(2)} litros</TextStyle>
+          <TextStyle>Bebi "{copos}" copos de água.</TextStyle>
+          <TextStyle>Bebi "{totalMl}" ml de água.</TextStyle>
 
-      <StatusBar style="light" />
+          <Progress.Circle
+            style={{
+              marginTop: 20,
+            }}
+            progress={((totalMl / (Number(peso)*35)) * 100) / 100}
+            size={120}
+            thickness={10}
+            showsText={true}
+          />
+
+          <ButtonStyle accessibilityLabel="Beber" onPress={addCopo}>
+            <TextStyle>Beber</TextStyle>
+          </ButtonStyle>
+          <ButtonsContainerStyle>
+            <ButtonStyle accessibilityLabel="Retirar" onPress={remoCopos}>
+              <TextStyle>Retirar</TextStyle>
+            </ButtonStyle>
+
+            <ButtonStyle
+              accessibilityLabel="Zerar"
+              onPress={() => {
+                Alert.alert(
+                  "Zerar 😲",
+                  "Você quer zerar o contador de copos de água!",
+                  [
+                    {
+                      text: "Cancelar",
+                      onPress: () => console.log("Cancelar"),
+                    },
+                    {
+                      text: "Confirmar",
+                      onPress: async () => {
+                        await AsyncStorage.setItem("copos", "0");
+                        setCopos(0);
+                      },
+                    },
+                  ]
+                );
+              }}
+            >
+              <TextStyle>Zerar</TextStyle>
+            </ButtonStyle>
+          </ButtonsContainerStyle>
+
+          <StatusBar style="light" />
+        </>
+      )}
     </HomeStyle>
   );
 }
