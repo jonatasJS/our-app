@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Alert, TextInput, Text, Platform } from "react-native";
+import { Alert, TextInput, Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { StatusBar } from "expo-status-bar";
 import * as Progress from "react-native-progress";
 import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
+import NotificationSounds, { playSampleSound } from  'react-native-notification-sounds';
 // import { TextInput } from "react-native-paper";
 
 import {
@@ -78,9 +79,6 @@ export default function HomeScreen() {
     //   const { status } = await Camera.requestCameraPermissionsAsync();
     //   setHasPermission(status === "granted");
     // })();
-    registerForPushNotificationsAsync().then((token) =>
-      setExpoPushToken(token)
-    );
 
     notificationListener.current =
       Notifications.addNotificationReceivedListener((notification) => {
@@ -113,16 +111,16 @@ export default function HomeScreen() {
             content: {
               title: "🎊 Parabéns! 🎉",
               body: "Você acaba de beber 5 copos!",
-              sound: true,
-              vibrate: [0, 250, 250, 250],
+              sound: 'notification-sound.mp3',
               priority: "high",
-              data: {
-                mySpecialData: "Some text",
-              },
             },
-            trigger: { seconds: 1 },
+            trigger: null,
           });
-
+          await NotificationSounds.getNotifications('notification')
+            .then(async soundsList  => {
+              console.warn('SOUNDS', JSON.stringify(soundsList));
+              await playSampleSound(soundsList[1]);
+            });
           return setShowConfetti(true);
         }
 
@@ -132,14 +130,10 @@ export default function HomeScreen() {
             content: {
               title: "🎊 Parabéns! 🎉",
               body: "Você acaba de beber 10 copos!",
-              sound: true,
-              vibrate: [0, 250, 250, 250],
+              sound: 'notification-sound.mp3',
               priority: "high",
-              data: {
-                mySpecialData: "Some text",
-              },
             },
-            trigger: { seconds: 1 },
+            trigger: null,
           });
           return setShowConfetti(true);
         }
