@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Alert, TextInput, Text, Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { StatusBar } from "expo-status-bar";
 import * as Progress from "react-native-progress";
-import * as Notifications from 'expo-notifications';
-import * as Device from 'expo-device';
+import * as Notifications from "expo-notifications";
+import * as Device from "expo-device";
 // import { TextInput } from "react-native-paper";
 
 import {
@@ -16,7 +16,19 @@ import {
 } from "../../styles/HomeStyles";
 import { Button } from "react-native-paper";
 
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
 export default function HomeScreen() {
+  const [expoPushToken, setExpoPushToken] = useState("");
+  const [notification, setNotification] = useState(null);
+  const notificationListener = useRef(null);
+  const responseListener = useRef(null);
   const [copos, setCopos] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [peso, setPeso] = useState("62" || null);
@@ -50,28 +62,48 @@ export default function HomeScreen() {
         setCopos(0);
       }
       if (
-        await AsyncStorage.getItem("ml") == ('' || null || undefined) ||
-        await AsyncStorage.getItem("peso") == ('' || null || undefined)
-      ) return setShowContainer(false);
-      
+        (await AsyncStorage.getItem("ml")) == ("" || null || undefined) ||
+        (await AsyncStorage.getItem("peso")) == ("" || null || undefined)
+      )
+        return setShowContainer(false);
+
       setCopos(Number(await AsyncStorage.getItem("copos")) || 0);
-      setPeso(await AsyncStorage.getItem("peso") || "0");
-      setMl(await AsyncStorage.getItem("ml") || "0");
+      setPeso((await AsyncStorage.getItem("peso")) || "0");
+      setMl((await AsyncStorage.getItem("ml")) || "0");
     }, 1);
 
-    (async () => await registerForPushNotificationsAsync().then(token => {
-      console.clear();
-      console.log(new Date())
-      console.log(token)
-    }))();
+    (async () =>
+      await registerForPushNotificationsAsync().then((token) => token))();
     // (async () => {
     //   const { status } = await Camera.requestCameraPermissionsAsync();
     //   setHasPermission(status === "granted");
     // })();
+    registerForPushNotificationsAsync().then((token) =>
+      setExpoPushToken(token)
+    );
+
+    notificationListener.current =
+      Notifications.addNotificationReceivedListener((notification) => {
+        return setNotification(notification);
+      });
+
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        console.log(response);
+      });
+
+    return () => {
+      Notifications.removeNotificationSubscription(
+        notificationListener.current
+      );
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
   }, []);
 
   async function addCopo() {
     try {
+      console.log("notification:", notification);
+      console.log("expoPushToken:", expoPushToken);
       setCopos(copos + 1);
       setTotalMl(totalMl + Number(ml));
       await AsyncStorage.setItem("copos", `${copos + 1}`, async () => {
@@ -81,11 +113,16 @@ export default function HomeScreen() {
             content: {
               title: "🎊 Parabéns! 🎉",
               body: "Você acaba de beber 5 copos!",
-              sound: true,
+              sound: 'custom',
+              vibrate: [0, 250, 250, 250],
+              priority: "high",
+              data: {
+                mySpecialData: "Some text",
+              },
             },
-            trigger: null,
+            trigger: { seconds: 1 },
           });
-          
+
           return setShowConfetti(true);
         }
 
@@ -95,10 +132,14 @@ export default function HomeScreen() {
             content: {
               title: "🎊 Parabéns! 🎉",
               body: "Você acaba de beber 10 copos!",
-              sound: true,
+              sound: 'custom',
+              vibrate: [0, 250, 250, 250],
+              priority: "high",
+              data: {
+                mySpecialData: "Some text",
+              },
             },
-            trigger: null,
-            
+            trigger: { seconds: 1 },
           });
           return setShowConfetti(true);
         }
@@ -134,53 +175,55 @@ export default function HomeScreen() {
 
   return (
     <HomeStyle>
-      {showContainer && <>
-        <TextInput
-          autoFocus
-          // placeholder="Seu pezo..."
-          style={{
-            backgroundColor: "#00000050",
-            width: "80%",
-            color: "#fff",
-            marginBottom: 10,
-            borderRadius: 10,
-            padding: 20,
-          }}
-          value={peso}
-          onChangeText={(text) => setPeso(text)}
-        ></TextInput>
-        <TextInput
-          // placeholder="Seu pezo..."
-          style={{
-            backgroundColor: "#00000050",
-            width: "80%",
-            color: "#fff",
-            marginBottom: 10,
-            borderRadius: 10,
-            padding: 20,
-          }}
-          value={ml}
-          onChangeText={(text) => setMl(text)}
-        ></TextInput>
-        <Button
-          style={{
-            backgroundColor: "#3498db",
-            width: "80%",
-            marginBottom: 10,
-            borderRadius: 10,
-            padding: 20,
-          }}
-          mode="outlined"
-          onPress={async () => {
-            if (peso == null) return Alert.alert("Peso inválido!");
-            Alert.alert("Peso salvo com sucesso!");
-            await AsyncStorage.setItem("peso", peso);
-            setShowContainer(true);
-          }}
-        >
-          Teste
-        </Button>
-      </>}
+      {showContainer && (
+        <>
+          <TextInput
+            autoFocus
+            // placeholder="Seu pezo..."
+            style={{
+              backgroundColor: "#00000050",
+              width: "80%",
+              color: "#fff",
+              marginBottom: 10,
+              borderRadius: 10,
+              padding: 20,
+            }}
+            value={peso}
+            onChangeText={(text) => setPeso(text)}
+          ></TextInput>
+          <TextInput
+            // placeholder="Seu pezo..."
+            style={{
+              backgroundColor: "#00000050",
+              width: "80%",
+              color: "#fff",
+              marginBottom: 10,
+              borderRadius: 10,
+              padding: 20,
+            }}
+            value={ml}
+            onChangeText={(text) => setMl(text)}
+          ></TextInput>
+          <Button
+            style={{
+              backgroundColor: "#3498db",
+              width: "80%",
+              marginBottom: 10,
+              borderRadius: 10,
+              padding: 20,
+            }}
+            mode="outlined"
+            onPress={async () => {
+              if (peso == null) return Alert.alert("Peso inválido!");
+              Alert.alert("Peso salvo com sucesso!");
+              await AsyncStorage.setItem("peso", peso);
+              setShowContainer(true);
+            }}
+          >
+            Teste
+          </Button>
+        </>
+      )}
       {!showContainer && (
         <>
           {showConfetti && (
@@ -213,7 +256,7 @@ export default function HomeScreen() {
             style={{
               marginTop: 20,
             }}
-            progress={((totalMl / (Number(peso)*35)) * 100) / 100}
+            progress={((totalMl / (Number(peso) * 35)) * 100) / 100}
             size={120}
             thickness={10}
             showsText={true}
@@ -262,33 +305,47 @@ export default function HomeScreen() {
   );
 }
 
+async function schedulePushNotification() {
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: "You've got mail! 📬",
+      body: "Here is the notification body",
+      data: { data: "goes here" },
+    },
+    trigger: { seconds: 2 },
+  });
+}
+
 async function registerForPushNotificationsAsync() {
+  let token;
   if (Device.isDevice) {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
-    if (existingStatus !== 'granted') {
+    if (existingStatus !== "granted") {
       const { status } = await Notifications.requestPermissionsAsync();
       finalStatus = status;
     }
-    if (finalStatus !== 'granted') {
-      alert('Failed to get push token for push notification!');
+    if (finalStatus !== "granted") {
+      alert("Failed to get push token for push notification!");
       return;
     }
-    const token = (await Notifications.getExpoPushTokenAsync()).data;
+    token = (await Notifications.getExpoPushTokenAsync()).data;
     console.log(token);
-    this.setState({ expoPushToken: token });
   } else {
-    alert('Must use physical device for Push Notifications');
+    alert("Must use physical device for Push Notifications");
   }
 
-  if (Platform.OS === 'android') {
-    Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
+  if (Platform.OS === "android") {
+    await Notifications.setNotificationChannelAsync("default", {
+      name: "default",
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#FF231F7C',
+      lightColor: "#FF231F7C",
     });
   }
+
+  return token;
 }
 
 /*

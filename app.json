@@ -43,7 +43,7 @@
           "icon": "./assets/icon-2.png",
           "color": "#ffffff",
           "sounds": [
-            "./assets/notification-sound.mp3"
+            "./assets/sounds/notification-sound.mp3"
           ]
         }
       ]
