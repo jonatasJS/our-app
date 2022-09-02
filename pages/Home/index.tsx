@@ -113,7 +113,7 @@ export default function HomeScreen() {
             content: {
               title: "🎊 Parabéns! 🎉",
               body: "Você acaba de beber 5 copos!",
-              sound: 'custom',
+              sound: true,
               vibrate: [0, 250, 250, 250],
               priority: "high",
               data: {
@@ -132,7 +132,7 @@ export default function HomeScreen() {
             content: {
               title: "🎊 Parabéns! 🎉",
               body: "Você acaba de beber 10 copos!",
-              sound: 'custom',
+              sound: true,
               vibrate: [0, 250, 250, 250],
               priority: "high",
               data: {
