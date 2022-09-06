@@ -1,7 +1,7 @@
 // Pagina de perfil
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import { Image, Linking, View, StyleSheet } from "react-native";
+import { Image, Linking, View, StyleSheet, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import {
   Avatar,
@@ -9,7 +9,10 @@ import {
   Caption,
   Text,
   TouchableRipple,
+  Button,
+  shadow,
 } from "react-native-paper";
+import * as Google from "expo-google-app-auth";
 
 import {
   ProfileStyle,
@@ -18,31 +21,97 @@ import {
 } from "../../styles/ProfileStyles";
 
 interface DataTypes {
-  login: string;
+  picture: string;
   name: string;
-  bio: string;
-  avatar_url: string;
-  company: string;
-  location: string;
-  blog: string;
-  following: number;
-  followers: number;
+  email: string;
 }
 
 export default function ProfileScreen() {
-  const [data, setData] = React.useState({} as DataTypes);
+  const [data, setData] = useState({} as DataTypes);
+  const [userData, setUseData] = useState({} as DataTypes);
+  const [accessToken, setAccessToken] = useState(null);
 
-  useEffect(() => {
-    setTimeout(async () => {
-      await fetch("https://api.github.com/users/jonatasjs")
-        .then(async (response) => await response.json())
-        .then(async (json) => await setData(json));
-    }, 1);
-  }, []);
+  // useEffect(() => {
+  //   setTimeout(async () => {
+  //     await fetch("https://api.github.com/users/jonatasjs")
+  //       .then(async (response) => await response.json())
+  //       .then(async (json) => await setData(json));
+  //   }, 1);
+  // }, []);
+  console.log(userData);
+  console.log(accessToken);
+
+  async function handleLogin() {
+    try {
+      console.log("Login");
+      const result = await Google.logInAsync({
+        androidClientId: "234834103311-ien344co0l8svq4910e72n4r14gvjbd3.apps.googleusercontent.com",
+        iosClientId: "234834103311-8a9h9btm6354rp7qh5tkidsjlmtk7o1k.apps.googleusercontent.com",
+        scopes: ["profile", "email"]
+      });
+
+      if (result.type === "success") {
+        setAccessToken(result.accessToken);
+      } else {
+        console.log("cancelled");
+      }
+    } catch (e) {
+      console.log("error:", e);
+      Alert.alert("Erro ao fazer login", "Tente novamente mais tarde\n" + e);;
+    }
+  }
+
+  async function handleGetUserData() {
+    try {
+      console.log(accessToken);
+      const response = await fetch(
+        "https://www.googleapis.com/userinfo/v2/me",
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      );
+      const data = await response.json();
+      setUseData(data);
+    } catch (error) {
+      console.log("error:", error);
+      Alert.alert("Erro ao buscar dados", "Tente novamente mais tarde\n" + error);;
+    }
+  }
+
+  function showUserData() {
+    if (userData.name) {
+      return (
+        <View style={ProfileStyle.userInfoSection}>
+          <View style={{ flexDirection: "row", marginTop: 15 }}>
+            <Avatar.Image
+              source={{
+                uri: userData.picture,
+              }}
+              size={80}
+            />
+            <View style={{ marginLeft: 20 }}>
+              <Title style={[TextStyle.title, { marginTop: 15, marginBottom: 5 }]}>
+                {userData.name}
+              </Title>
+              <Caption style={TextStyle.caption}>{userData.email}</Caption>
+            </View>
+          </View>
+        </View>
+      );
+    } else {
+      return (
+        // <View style={styles.loading}>
+        //   <Image source={require("../../assets/splash-animate.gif")} />
+        //   <Text style={styles.loadingText}>Carregando...</Text>
+        // </View>
+        ''
+      );
+    }
+  }
 
   return (
     <ProfileStyle>
-      {data && (
+      {/* {data.name && (
         <UserInfoSection>
           <View
             style={{
@@ -135,7 +204,13 @@ export default function ProfileScreen() {
           <Image source={require("../../assets/splash-animate.gif")} />
           <Text style={styles.loadingText}>Carregando...</Text>
         </View>
-      )}
+      )} */}
+      {!userData.name && <TextStyle
+        onPress={userData.name ? handleGetUserData : handleLogin}
+      >
+        Entrar
+      </TextStyle>}
+      {showUserData()}
 
       <StatusBar style="light" />
     </ProfileStyle>
