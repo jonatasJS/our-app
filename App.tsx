@@ -1,179 +1,276 @@
-import React, { useEffect, useState } from "react";
-import { View, Image, Text, StyleSheet } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import React, { useEffect, useState, useRef } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  TouchableOpacity,
+  Animated,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import * as Updates from "expo-updates";
+import ConfettiCannon from "react-native-confetti-cannon";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Notifications from "expo-notifications";
+import { AddRemoveButton } from "./components/AddRemoveButton";
 
-const Tab = createBottomTabNavigator();
+const amounts = [250, 500, 1000, 1500];
 
-import HomeScreen from "./pages/Home/index";
-import ProfileScreen from "./pages/Profile/index";
-import SettingsScreen from "./pages/Settings/index";
+// Async Storage
+const storeData = async (value, key = "@amount") => {
+  try {
+    await AsyncStorage.setItem(key, value);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+const getData = async (key, setValue) => {
+  try {
+    const value = await AsyncStorage.getItem(key);
+    if (value !== null) {
+      setValue(Number(value));
+    }
+  } catch (e) {
+    // error reading value
+    console.log(e);
+  }
+};
+
+const renderConfetti = () => {
+  return <ConfettiCannon count={200} origin={{ x: 0, y: 0 }} fadeOut={true} />;
+};
+
+// Notifications
+
+async function scheduleNotification() {
+  await Notifications.requestPermissionsAsync().then((permission) => {
+    Notifications.scheduleNotificationAsync({
+      content: {
+        title: "💧 Water Reminder",
+        subtitle: "Your body needs water!",
+      },
+      trigger: {
+        repeats: true,
+        seconds: 60,
+      },
+    });
+  });
+}
 
 export default function App() {
-  const [isLoading, setIsLoading] = useState(true);
+  const [fillingPercentage, setFillingPercentage] = useState(0);
+  const [waterGoal, setWaterGoal] = useState(3000);
+  const [waterDrank, setWaterDrank] = useState(0);
+  const [isGoalAchieved, setIsGoalAchieved] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+
+  // Progress Bar Animation
+  const barHeight = useRef(new Animated.Value(0)).current;
+  const progressPercent = barHeight.interpolate({
+    inputRange: [0, 100],
+    outputRange: ["0%", `100%`],
+  });
 
   useEffect(() => {
-    setTimeout(() => {
-      setIsLoading(false); // seta o loading para false
-    }, 3000);
-    async function up() {
-      const { isAvailable } = await Updates.checkForUpdateAsync();
-      if (isAvailable) {
-        await Updates.fetchUpdateAsync();
-        await Updates.reloadAsync();
-      }
-    }
-
-    up();
+    getData("@amount", setWaterDrank);
+    getData("@goal", setWaterGoal);
   }, []);
 
+  useEffect(() => {
+    Animated.timing(barHeight, {
+      duration: 1000,
+      toValue: fillingPercentage / 3,
+      useNativeDriver: false,
+    }).start();
+  }, [fillingPercentage]);
+
+  // End of Progress Bar Animation
+
+  useEffect(() => {
+    storeData(waterGoal.toString(), "@goal");
+  }, [waterGoal]);
+
+  useEffect(() => {
+    storeData(waterDrank.toString(), "@amount");
+  }, [waterDrank]);
+
+  useEffect(() => {
+    // percentage = waterDrank * 100 / waterGoal
+    let percentage = (waterDrank * 100) / waterGoal;
+    let fillingP = (percentage * 300) / 100;
+    setFillingPercentage(fillingP > 300 ? 300 : fillingP);
+  }, [waterGoal, setFillingPercentage, waterDrank]);
+
+  useEffect(() => {
+    if (waterDrank >= waterGoal && isGoalAchieved === false) {
+      setIsGoalAchieved(true);
+    }
+    if (waterDrank < waterGoal && isGoalAchieved === true) {
+      setIsGoalAchieved(false);
+    }
+
+    if (showConfetti === false && isGoalAchieved === true) {
+      setShowConfetti(true);
+    } else {
+      setShowConfetti(false);
+    }
+  }, [waterDrank, isGoalAchieved, waterGoal]);
+
   return (
-    <NavigationContainer>
-      {isLoading && (
-        <View style={styles.loading}>
-          <Image source={require("./assets/splash-animate.gif")} />
-          <Text style={styles.loadingText}>Carregando...</Text>
+    <SafeAreaView style={styles.container}>
+      {showConfetti && renderConfetti()}
+      {/* Water Goal */}
+      <View style={styles.waterGoalContainer}>
+        <Text style={[styles.blueText, { fontSize: 22 }]}>Your Goal</Text>
+
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text style={[styles.grayText, { fontSize: 26 }]}>
+            {waterGoal} mL{" "}
+          </Text>
+          {/* Add Goal */}
+          <TouchableOpacity
+            style={{ padding: 5 }}
+            onPress={() => setWaterGoal(waterGoal + 250)}
+          >
+            <Ionicons name="add-circle" size={26} color="#2389da" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ padding: 5 }}
+            onPress={() => setWaterGoal(waterGoal - 250)}
+          >
+            <Ionicons name="remove-circle" size={26} color="#2389da" />
+          </TouchableOpacity>
         </View>
-      )}
-      {!isLoading && <Tab.Navigator
-        initialRouteName="Home"
-        screenOptions={{
-          tabBarShowLabel: false,
-          tabBarStyle: {
-            position: 'absolute',
-            borderTopWidth: 0,
+      </View>
 
-            bottom: 14,
-            left: 14,
-            right: 14,
-            elevation: 0,
-            borderRadius: 50,
-            height: 60
-          }
+      {/* ProgressView */}
+
+      <View
+        style={{
+          flexDirection: "row",
+          width: "90%",
+          justifyContent: "space-around",
         }}
-       >
-        <Tab.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{
-            headerShown: false,
-            tabBarIcon: ({ color, size, focused }) => {
-              if (focused)
-                return <Ionicons name="ios-home" size={size} color={color} />;
-              return (
-                <Ionicons name="ios-home-outline" size={size} color={color} />
-              );
+      >
+        {/* Water You've Drunk Label */}
+        <View style={{ justifyContent: "center" }}>
+          <Text style={[styles.grayText, { fontSize: 28 }]}>You've drunk</Text>
+          <Text style={[styles.blueText, { fontSize: 42 }]}>
+            {waterDrank} mL
+          </Text>
+          <Text style={[styles.grayText, { fontSize: 28 }]}>of water.</Text>
+        </View>
+
+        {/* Progress Bar */}
+        <View style={styles.progressBarContainer}>
+          <Animated.View
+            style={{
+              height: progressPercent,
+              backgroundColor: "#5abcd8",
+              borderRadius: 40,
+            }}
+          />
+        </View>
+      </View>
+
+      {/* Add Water */}
+      <View style={styles.waterButtonsContainer}>
+        {amounts.map((amount) => {
+          return (
+            <AddRemoveButton
+              key={"add" + amount}
+              amount={amount}
+              value={waterDrank}
+              setValue={setWaterDrank}
+              operation="add"
+            />
+          );
+        })}
+      </View>
+
+      {/* Remove Water */}
+      <View style={styles.waterButtonsContainer}>
+        {amounts.map((amount) => {
+          return (
+            <AddRemoveButton
+              key={"remove" + amount}
+              amount={amount}
+              value={waterDrank}
+              setValue={setWaterDrank}
+              operation="remove"
+            />
+          );
+        })}
+      </View>
+      <View
+        style={{
+          paddingVertical: 20,
+          flexDirection: "row",
+          width: "90%",
+          justifyContent: "space-between",
+        }}
+      >
+        <TouchableOpacity
+          style={[
+            styles.notificationButton,
+            {
+              backgroundColor: "#74ccf4",
             },
-          }}
-        />
-        <Tab.Screen
-          name="Settings"
-          component={SettingsScreen}
-          options={{
-            headerShown: false,
-            tabBarIcon: ({ color, size, focused }) => {
-              if (focused)
-                return (
-                  <Ionicons name="ios-settings" size={size} color={color} />
-                );
-              return (
-                <Ionicons
-                  name="ios-settings-outline"
-                  size={size}
-                  color={color}
-                />
-              );
+          ]}
+          onPress={() => scheduleNotification()}
+        >
+          <Text style={styles.notificationText}>Schedule Notification</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.notificationButton,
+            {
+              backgroundColor: "red",
             },
-          }}
-        />
-        <Tab.Screen
-          name="Profile"
-          component={ProfileScreen}
-          options={{
-            headerShown: false,
-            tabBarIcon: ({ color, size, focused }) => {
-              if (focused)
-                return <Ionicons name="ios-person" size={size} color={color} />;
-              return (
-                <Ionicons name="ios-person-outline" size={size} color={color} />
-              );
-            },
-          }}
-        />
-      </Tab.Navigator>}
-    </NavigationContainer>
+          ]}
+          onPress={() => Notifications.cancelAllScheduledNotificationsAsync()}
+        >
+          <Text style={styles.notificationText}>Cancel Notifications</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 }
-
-/*
-
-import moment from 'moment';
-import {
-  titleTimer,
-  hearthTimer,
-  daysTimer,
-  hoursTimer,
-  minutesTimer,
-  secondsTimer
-} from './utils/timers';
-
-export default function App() {
-  const aniv = moment([new Date().getFullYear(), 11, 30]);
-  const [days, setDays] = useState(0);
-  const [hours, setHours] = useState(0);
-  const [minutes, setMinutes] = useState(0);
-  const [seconds, setSeconds] = useState(0);
-
-  function start() {
-    setInterval(() => {
-      const now = moment([
-        new Date().getFullYear(),
-        new Date().getMonth() + 1,
-        new Date().getDay(),
-        new Date().getHours(),
-        new Date().getMinutes(),
-        new Date().getSeconds()
-      ]);
-      
-      setDays(aniv.diff(now, 'days'));
-      setHours(aniv.diff(now, 'hours'));
-      setMinutes(aniv.diff(now, 'minutes'));
-      setSeconds(aniv.diff(now, 'seconds'))
-    }, 1000);
-  }
-
-  useEffect(start, []);
-
-  return (
-    <View style={styles.container}>
-      {titleTimer.indexOf(new Date().getSeconds()) != -1 && <Text style={styles.text}>oie meu amor!</Text>}
-      {hearthTimer.indexOf(new Date().getSeconds()) != -1 && <Text style={styles.text2}>❤❤❤</Text>}
-      {daysTimer.indexOf(new Date().getSeconds()) != -1 && <Text style={styles.text}>falta {days} dias</Text>}
-      {hoursTimer.indexOf(new Date().getSeconds()) != -1 && <Text style={styles.text}>falta {hours} horas</Text>}
-      {minutesTimer.indexOf(new Date().getSeconds()) != -1 && <Text style={styles.text}>falta {minutes} minutos</Text>}
-      {secondsTimer.indexOf(new Date().getSeconds()) != -1 && <Text style={styles.text}>falta {seconds} segundos</Text>}
-      <StatusBar style="light" />
-    </View>
-  );
-}
-
-*/
 
 const styles = StyleSheet.create({
-  loading: {
+  container: {
     flex: 1,
-    backgroundColor: "#1E3B81",
+    backgroundColor: "#fff",
     alignItems: "center",
-    justifyContent: "center",
-    display: "flex",
-    textAlign: "center",
   },
-  loadingText: {
-    color: "#fff",
-    fontSize: 20,
-    fontWeight: "bold",
-    textAlign: "center",
-  }
+  progressBarContainer: {
+    borderRadius: 40,
+    borderWidth: 1,
+    width: 40,
+    height: 300,
+    justifyContent: "flex-end",
+  },
+  waterButtonsContainer: {
+    flexDirection: "row",
+    paddingVertical: 10,
+    width: "90%",
+    justifyContent: "space-between",
+  },
+  waterGoalContainer: {
+    padding: 50,
+    alignItems: "center",
+  },
+  blueText: {
+    color: "#1ca3ec",
+    fontWeight: "600",
+  },
+  grayText: { color: "#323033", fontWeight: "600" },
+  notificationButton: {
+    height: 50,
+    borderRadius: 20,
+    justifyContent: "center",
+    padding: 7,
+  },
+  notificationText: { color: "white", fontWeight: "500", fontSize: 16 },
 });
