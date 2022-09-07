@@ -13,6 +13,7 @@
     "up:app": "expo publish"
   },
   "dependencies": {
+<<<<<<< HEAD
     "@react-native-async-storage/async-storage": "~1.15.0",
     "expo": "~42.0.1",
     "expo-notifications": "~0.12.3",
@@ -20,6 +21,28 @@
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-42.0.0.tar.gz",
+=======
+    "@draftbit/ui": "^46.2.1",
+    "@expo/webpack-config": "^0.17.2",
+    "@react-native-async-storage/async-storage": "^1.17.10",
+    "@react-native-community/masked-view": "^0.1.11",
+    "@react-navigation/bottom-tabs": "^6.3.3",
+    "@react-navigation/native": "^6.0.12",
+    "@types/react": "^18.0.18",
+    "@types/react-native": "^0.69.6",
+    "expo": "^46.0.10",
+    "expo-application": "^4.2.2",
+    "expo-camera": "^12.3.0",
+    "expo-device": "^4.3.0",
+    "expo-google-app-auth": "8.3.0",
+    "expo-notifications": "^0.16.1",
+    "expo-status-bar": "^1.4.0",
+    "expo-updates": "^0.14.5",
+    "moment": "^2.29.4",
+    "react": "18.0.0",
+    "react-dom": "18.0.0",
+    "react-native": "^0.69.5",
+>>>>>>> 855c42ad15044d3033717f318004d37d57c5bbc2
     "react-native-confetti-cannon": "^1.5.2",
     "react-native-web": "~0.13.12"
   },
