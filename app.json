@@ -4,32 +4,30 @@
     "slug": "our-app",
     "version": "1.0.2",
     "orientation": "portrait",
-    "icon": "./assets/icon-2.png",
+    "icon": "./assets/icons/newIconNoBG.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash-static.png",
+      "image": "./assets/icons/newIconNoBG.png",
       "resizeMode": "contain",
-      "backgroundColor": "#1E3B81"
+      "backgroundColor": "#fff"
     },
     "updates": {
-      "fallbackToCacheTimeout": 1
+      "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/icon-2.png",
-        "backgroundColor": "#1E3B81"
-      },
       "versionCode": 1,
-      "package": "com.nextrockt.ourapp"
+      "package": "com.nextrockt.ourapp",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icons/newIconNoBG.png",
+        "backgroundColor": "#1E3B8100"
+      }
     },
     "web": {
-      "favicon": "./assets/icon-2.png"
+      "favicon": "./assets/icons/newIconNoBG.png"
     },
     "extra": {
       "eas": {
@@ -40,13 +38,12 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/icon-2.png",
+          "icon": "./assets/icons/newIconNoBG.png",
           "color": "#ffffff",
-          "sounds": [
-            "./assets/sounds/notification-sound.mp3"
-          ]
+          "sounds": ["./assets/sounds/notification-sound.wav"]
         }
       ]
-    ]
+    ],
+    "description": "Beba água"
   }
 }

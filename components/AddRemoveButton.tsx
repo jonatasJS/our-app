@@ -2,6 +2,7 @@ import React, { useRef } from "react";
 import { View, TouchableOpacity, Text, Animated } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
+
 export const AddRemoveButton = ({
   amount,
   value,
@@ -58,10 +59,14 @@ export const AddRemoveButton = ({
         }}
       >
         <Animated.View style={{ transform: [{ translateX: shakeAnimation }] }}>
-          <MaterialCommunityIcons name="bottle-soda" size={24} color="white" />
+          <MaterialCommunityIcons
+            name={amount == 200? "beer-outline" : amount == 250 ? "bottle-soda-outline" : "bottle-soda"}
+            size={24}
+            color="white"
+          />
         </Animated.View>
       </View>
-      <Text style={{ color: "#5a595b", fontWeight: "600" }}>{amount} mL</Text>
+      <Text style={{ color: "#5a595b", fontWeight: "600" }}>{amount} ml</Text>
     </TouchableOpacity>
   );
 };

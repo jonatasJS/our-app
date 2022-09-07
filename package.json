@@ -1,5 +1,5 @@
 {
-  "name": "our-app",
+  "name": "beba-agua",
   "version": "1.0.2",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
@@ -7,24 +7,30 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "pk-update": "yarn-upgrade-all",
+    "up": "yarn-upgrade-all",
     "build:android": "expo build:android",
     "build:ios": "expo build:ios",
     "up:app": "expo publish"
   },
   "dependencies": {
-    "@react-native-async-storage/async-storage": "~1.15.0",
-    "expo": "~42.0.1",
-    "expo-notifications": "~0.12.3",
-    "expo-status-bar": "~1.0.4",
-    "react": "16.13.1",
-    "react-dom": "16.13.1",
-    "react-native": "https://github.com/expo/react-native/archive/sdk-42.0.0.tar.gz",
+    "@expo/webpack-config": "^0.17.0",
+    "@react-native-async-storage/async-storage": "^1.17.10",
+    "@types/react": "~18.0.0",
+    "@types/react-native": "~0.69.1",
+    "expo": "^46.0.10",
+    "expo-notifications": "^0.16.1",
+    "expo-status-bar": "^1.4.0",
+    "expo-updates": "^0.14.5",
+    "react": "18.0.0",
+    "react-dom": "18.0.0",
+    "react-native": "0.69.5",
+    "react-native-animate-number": "^0.1.2",
     "react-native-confetti-cannon": "^1.5.2",
-    "react-native-web": "~0.13.12"
+    "react-native-web": "^0.18.9",
+    "typescript": "^4.6.3"
   },
   "devDependencies": {
-    "@babel/core": "^7.9.0",
+    "@babel/core": "^7.19.0",
     "yarn-upgrade-all": "^0.7.1"
   },
   "private": true

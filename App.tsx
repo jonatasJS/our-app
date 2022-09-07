@@ -10,10 +10,13 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import ConfettiCannon from "react-native-confetti-cannon";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import AnimateNumber from "react-native-animate-number";
 import * as Notifications from "expo-notifications";
+import * as Update from "expo-updates";
+
 import { AddRemoveButton } from "./components/AddRemoveButton";
 
-const amounts = [250, 500, 1000, 1500];
+const amounts = [200, 250, 500];
 
 // Async Storage
 const storeData = async (value, key = "@amount") => {
@@ -37,22 +40,35 @@ const getData = async (key, setValue) => {
 };
 
 const renderConfetti = () => {
-  return <ConfettiCannon count={200} origin={{ x: 0, y: 0 }} fadeOut={true} />;
+  return <ConfettiCannon
+    count={100}
+    origin={{ x: 0, y: 0 }}
+    fadeOut={true}
+
+  />;
 };
 
 // Notifications
-
 async function scheduleNotification() {
-  await Notifications.requestPermissionsAsync().then((permission) => {
-    Notifications.scheduleNotificationAsync({
+  await Notifications.requestPermissionsAsync().then(async (permission) => {
+    console.log("permission", permission);
+    await Notifications.scheduleNotificationAsync({
       content: {
-        title: "💧 Water Reminder",
-        subtitle: "Your body needs water!",
+        title: "Beba água!",
+        subtitle: "🚰 Não se esqueça de beber água",
+        body: "🤪 É hora de beber água",
+        priority: Notifications.AndroidNotificationPriority.HIGH,
+        sticky: true,
+        sound: true,
+        vibrate: [0, 250, 0, 250, 0, 250],
       },
       trigger: {
         repeats: true,
-        seconds: 60,
+        seconds: 10
+        // seconds: (60 * 60) / 2,
       },
+    }).then((notification) => {
+      console.log("notification", notification);
     });
   });
 }
@@ -61,6 +77,7 @@ export default function App() {
   const [fillingPercentage, setFillingPercentage] = useState(0);
   const [waterGoal, setWaterGoal] = useState(3000);
   const [waterDrank, setWaterDrank] = useState(0);
+  const [day, setDay] = useState(new Date().getDate());
   const [isGoalAchieved, setIsGoalAchieved] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
 
@@ -72,8 +89,19 @@ export default function App() {
   });
 
   useEffect(() => {
+    getData("@day", setDay);
     getData("@amount", setWaterDrank);
     getData("@goal", setWaterGoal);
+    (async () => {
+      await Update.checkForUpdateAsync().then(async (update) => {
+        if (update.isAvailable) {
+          await Update.fetchUpdateAsync().then(async () => {
+            await Update.reloadAsync();
+          });
+        }
+      });
+      await scheduleNotification();
+    })();
   }, []);
 
   useEffect(() => {
@@ -82,10 +110,19 @@ export default function App() {
       toValue: fillingPercentage / 3,
       useNativeDriver: false,
     }).start();
+
+    // Se o dia de hoje for diferente do dia que já está salvo no async storage, então resetar o valor de agua bebida
+    const today = new Date().getDate();
+    getData("@day", (day) => {
+      if (day !== today) {
+        storeData(today.toString(), "@day");
+        storeData("0", "@amount");
+        setWaterDrank(0);
+      }
+    });
   }, [fillingPercentage]);
 
   // End of Progress Bar Animation
-
   useEffect(() => {
     storeData(waterGoal.toString(), "@goal");
   }, [waterGoal]);
@@ -119,46 +156,98 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       {showConfetti && renderConfetti()}
+
       {/* Water Goal */}
       <View style={styles.waterGoalContainer}>
-        <Text style={[styles.blueText, { fontSize: 22 }]}>Your Goal</Text>
+        <Text
+          style={[
+            styles.blueText,
+            {
+              fontSize: 22,
+              textAlign: "center",
+              alignItems: "center",
+              justifyContent: "center",
+            },
+          ]}
+        >
+          Seu objetivo
+        </Text>
 
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={[styles.grayText, { fontSize: 26 }]}>
-            {waterGoal} mL{" "}
+        <View
+          style={{
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <Text
+            style={[
+              styles.grayText,
+              {
+                fontSize: 26,
+                textAlign: "center",
+                alignItems: "center",
+                justifyContent: "center",
+              },
+            ]}
+          >
+            {waterGoal} ml{" "}
           </Text>
-          {/* Add Goal */}
-          <TouchableOpacity
-            style={{ padding: 5 }}
-            onPress={() => setWaterGoal(waterGoal + 250)}
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              display: "flex",
+            }}
           >
-            <Ionicons name="add-circle" size={26} color="#2389da" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{ padding: 5 }}
-            onPress={() => setWaterGoal(waterGoal - 250)}
-          >
-            <Ionicons name="remove-circle" size={26} color="#2389da" />
-          </TouchableOpacity>
+            {/* Add Goal */}
+            <TouchableOpacity
+              style={{
+                padding: 5,
+                marginRight: 20,
+                marginTop: 10
+              }}
+              onPress={() => {
+                if(waterGoal <= 200) return setWaterGoal(200);
+                setWaterGoal(waterGoal - 200)
+              }}
+            >
+              <Ionicons name="remove-circle" size={26 * 2} color="#2389da" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{
+                padding: 5,
+                marginLeft: 20,
+                marginTop: 10
+              }}
+              onPress={() => {
+                setWaterGoal(waterGoal + 200)
+              }}
+            >
+              <Ionicons name="add-circle" size={26 * 2} color="#2389da" />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 
       {/* ProgressView */}
-
       <View
         style={{
           flexDirection: "row",
           width: "90%",
           justifyContent: "space-around",
+          alignItems: "center",
         }}
       >
         {/* Water You've Drunk Label */}
         <View style={{ justifyContent: "center" }}>
-          <Text style={[styles.grayText, { fontSize: 28 }]}>You've drunk</Text>
+          <Text style={[styles.grayText, { fontSize: 28 }]}>Você bebeu</Text>
           <Text style={[styles.blueText, { fontSize: 42 }]}>
-            {waterDrank} mL
+            {waterDrank} ml
           </Text>
-          <Text style={[styles.grayText, { fontSize: 28 }]}>of water.</Text>
+          <Text style={[styles.grayText, { fontSize: 33, marginTop: -5 }]}>
+            de água.
+          </Text>
         </View>
 
         {/* Progress Bar */}
@@ -170,38 +259,64 @@ export default function App() {
               borderRadius: 40,
             }}
           />
+          <AnimateNumber
+            style={[
+              styles.blueText,
+              {
+                fontSize: 33,
+                right: -120,
+                position: "absolute",
+                marginLeft: -120,
+                textAlign: "center",
+                alignItems: "center",
+                justifyContent: "center",
+              },
+            ]}
+            value={fillingPercentage}
+            formatter={(val) => `${(val / 3).toFixed(0)}%`}
+          />
         </View>
       </View>
 
-      {/* Add Water */}
-      <View style={styles.waterButtonsContainer}>
-        {amounts.map((amount) => {
-          return (
-            <AddRemoveButton
-              key={"add" + amount}
-              amount={amount}
-              value={waterDrank}
-              setValue={setWaterDrank}
-              operation="add"
-            />
-          );
-        })}
+      <View
+        style={{
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          width: "100%",
+        }}
+      >
+        {/* Add Water */}
+        <View style={styles.waterButtonsContainer}>
+          {amounts.map((amount) => {
+            return (
+              <AddRemoveButton
+                key={"add" + amount}
+                amount={amount}
+                value={waterDrank}
+                setValue={setWaterDrank}
+                operation="add"
+              />
+            );
+          })}
+        </View>
+
+        {/* Remove Water */}
+        <View style={styles.waterButtonsContainer}>
+          {amounts.map((amount) => {
+            return (
+              <AddRemoveButton
+                key={"remove" + amount}
+                amount={amount}
+                value={waterDrank}
+                setValue={setWaterDrank}
+                operation="remove"
+              />
+            );
+          })}
+        </View>
       </View>
 
-      {/* Remove Water */}
-      <View style={styles.waterButtonsContainer}>
-        {amounts.map((amount) => {
-          return (
-            <AddRemoveButton
-              key={"remove" + amount}
-              amount={amount}
-              value={waterDrank}
-              setValue={setWaterDrank}
-              operation="remove"
-            />
-          );
-        })}
-      </View>
       <View
         style={{
           paddingVertical: 20,
@@ -219,7 +334,7 @@ export default function App() {
           ]}
           onPress={() => scheduleNotification()}
         >
-          <Text style={styles.notificationText}>Schedule Notification</Text>
+          <Text style={styles.notificationText}>Agendar notificação</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -229,9 +344,11 @@ export default function App() {
               backgroundColor: "red",
             },
           ]}
-          onPress={() => Notifications.cancelAllScheduledNotificationsAsync()}
+          onPress={async () =>
+            await Notifications.cancelAllScheduledNotificationsAsync()
+          }
         >
-          <Text style={styles.notificationText}>Cancel Notifications</Text>
+          <Text style={styles.notificationText}>Cancelar notificações</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -243,6 +360,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
+    justifyContent: "space-around",
   },
   progressBarContainer: {
     borderRadius: 40,
@@ -255,7 +373,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingVertical: 10,
     width: "90%",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
   },
   waterGoalContainer: {
     padding: 50,
@@ -270,7 +388,7 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 20,
     justifyContent: "center",
-    padding: 7,
+    padding: 10,
   },
   notificationText: { color: "white", fontWeight: "500", fontSize: 16 },
 });
