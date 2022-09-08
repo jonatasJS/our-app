@@ -16,7 +16,10 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-5593915309329672~4135236573"
+      }
     },
     "android": {
       "versionCode": 1,
@@ -24,6 +27,9 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/newIcon.png",
         "backgroundColor": "#fff"
+      },
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-5593915309329672~4135236573"
       }
     },
     "web": {
@@ -45,5 +51,9 @@
       ]
     ],
     "description": "Beba água"
+  },
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-5593915309329672~4135236573",
+    "ios_app_id": "ca-app-pub-5593915309329672~4135236573"
   }
 }

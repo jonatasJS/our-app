@@ -8,6 +8,7 @@ export const AddRemoveButton = ({
   value,
   setValue,
   operation = "add",
+  primaryColor
 }) => {
   // Shake Animation
   const shakeAnimation = useRef(new Animated.Value(0)).current;
@@ -50,7 +51,7 @@ export const AddRemoveButton = ({
     >
       <View
         style={{
-          backgroundColor: operation == "add" ? "#1ca3ec" : "red",
+          backgroundColor: operation == "add" ? primaryColor : "red",
           width: 50,
           height: 50,
           borderRadius: 25,

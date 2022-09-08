@@ -13,6 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import AnimateNumber from "react-native-animate-number";
 import * as Notifications from "expo-notifications";
 import * as Update from "expo-updates";
+import Modal from "react-native-modal";
 
 import { AddRemoveButton } from "./components/AddRemoveButton";
 
@@ -40,12 +41,7 @@ const getData = async (key, setValue) => {
 };
 
 const renderConfetti = () => {
-  return <ConfettiCannon
-    count={100}
-    origin={{ x: 0, y: 0 }}
-    fadeOut={true}
-
-  />;
+  return <ConfettiCannon count={100} origin={{ x: 0, y: 0 }} fadeOut={true} />;
 };
 
 // Notifications
@@ -57,8 +53,6 @@ async function scheduleNotification() {
         title: "Beba água!",
         subtitle: "🚰 Não se esqueça de beber água",
         body: "🤪 É hora de beber água",
-        priority: Notifications.AndroidNotificationPriority.HIGH,
-        sticky: true,
         sound: true,
         vibrate: [0, 250, 0, 250, 0, 250],
       },
@@ -80,6 +74,9 @@ export default function App() {
   const [day, setDay] = useState(new Date().getDate());
   const [isGoalAchieved, setIsGoalAchieved] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [primaryColor, setPrimaryColor] = useState("#1ca3ec");
+  const [isNotitications, setIdNotifications] = useState(false);
 
   // Progress Bar Animation
   const barHeight = useRef(new Animated.Value(0)).current;
@@ -100,7 +97,6 @@ export default function App() {
           });
         }
       });
-      await scheduleNotification();
     })();
   }, []);
 
@@ -153,9 +149,186 @@ export default function App() {
     }
   }, [waterDrank, isGoalAchieved, waterGoal]);
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: "#fff",
+      alignItems: "center",
+      justifyContent: "space-around",
+    },
+    progressBarContainer: {
+      borderRadius: 40,
+      borderWidth: 1,
+      width: 40,
+      height: 300,
+      justifyContent: "flex-end",
+    },
+    centeredView: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "rgba(0,0,0,0.5)",
+    },
+    modalView: {
+      margin: 20,
+      backgroundColor: "white",
+      borderRadius: 20,
+      padding: 35,
+      alignItems: "center",
+      // shadowColor: "#000",
+      // shadowOffset: {
+      //   width: 0,
+      //   height: 2,
+      // }
+    },
+    modalText: {
+      marginBottom: 30,
+      textAlign: "center",
+    },
+    modalButtons: {
+      flexDirection: "row",
+      justifyContent: "space-evenly",
+      width: "50%",
+    },
+    button: {
+      height: 40,
+      borderRadius: 10,
+      justifyContent: "center",
+      alignItems: "center",
+      textAlign: "center",
+      paddingTop: 5,
+      paddingBottom: 5,
+      paddingLeft: 20,
+      paddingRight: 20,
+    },
+    buttonText: {
+      color: "#fff",
+      fontWeight: "bold",
+      textAlign: "center",
+    },
+    waterButtonsContainer: {
+      flexDirection: "row",
+      paddingVertical: 10,
+      width: "90%",
+      justifyContent: "space-around",
+    },
+    waterGoalContainer: {
+      padding: 50,
+      alignItems: "center",
+    },
+    blueText: {
+      color: primaryColor,
+      fontWeight: "600",
+    },
+    grayText: { color: "#323033", fontWeight: "600" },
+    notificationButton: {
+      height: 50,
+      borderRadius: 20,
+      justifyContent: "center",
+      padding: 10,
+    },
+    notificationText: { color: "white", fontWeight: "500", fontSize: 16 },
+  });
+
   return (
     <SafeAreaView style={styles.container}>
       {showConfetti && renderConfetti()}
+
+      {/* Modal */}
+      <Modal
+        animationIn={"slideInLeft"}
+        animationOut={"slideOutRight"}
+        animationInTiming={500}
+        animationOutTiming={500}
+        backdropTransitionInTiming={600}
+        backdropTransitionOutTiming={600}
+        isVisible={showModal}
+        onBackdropPress={() => setShowModal(false)}
+        onBackButtonPress={() => setShowModal(false)}
+        style={{ margin: 0 }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>
+              {isNotitications
+                ? "Você deseja desativar as notificações?"
+                : "Você quer ser notificado a cada 30 minutos para beber água?"}
+            </Text>
+
+            <View style={styles.modalButtons}>
+              {!isNotitications && (
+                <>
+                  <TouchableOpacity
+                    style={[
+                      styles.button,
+                      {
+                        backgroundColor: "#25f321",
+                      },
+                    ]}
+                    onPress={async () => {
+                      await scheduleNotification();
+                      setShowModal(false);
+                      setPrimaryColor("#25f321");
+                      setIdNotifications(true);
+                    }}
+                  >
+                    <Text style={styles.buttonText}>Sim</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      styles.button,
+                      {
+                        backgroundColor: "red",
+                      },
+                    ]}
+                    onPress={async () => {
+                      await Notifications.cancelAllScheduledNotificationsAsync();
+                      setShowModal(false);
+                      setPrimaryColor("#1E90FF");
+                    }}
+                  >
+                    <Text style={styles.buttonText}>Não</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+              {isNotitications && (
+                <>
+                  <TouchableOpacity
+                    style={[
+                      styles.button,
+                      {
+                        backgroundColor: "red",
+                      },
+                    ]}
+                    onPress={async () => {
+                      await Notifications.cancelAllScheduledNotificationsAsync();
+                      setShowModal(false);
+                      setPrimaryColor("#1E90FF");
+                      setIdNotifications(false);
+                    }}
+                  >
+                    <Text style={styles.buttonText}>Sim</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      styles.button,
+                      {
+                        backgroundColor: "#25f321",
+                      },
+                    ]}
+                    onPress={async () => {
+                      setShowModal(false);
+                      setPrimaryColor("#25f321");
+                    }}
+                  >
+                    <Text style={styles.buttonText}>Não</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       {/* Water Goal */}
       <View style={styles.waterGoalContainer}>
@@ -205,30 +378,42 @@ export default function App() {
               style={{
                 padding: 5,
                 marginRight: 20,
-                marginTop: 10
+                marginTop: 10,
               }}
               onPress={() => {
-                if(waterGoal <= 200) return setWaterGoal(200);
-                setWaterGoal(waterGoal - 200)
+                if (waterGoal <= 200) return setWaterGoal(200);
+                setWaterGoal(waterGoal - 200);
               }}
             >
-              <Ionicons name="remove-circle" size={26 * 2} color="#2389da" />
+              <Ionicons
+                name="remove-circle"
+                size={26 * 2}
+                color={primaryColor}
+              />
             </TouchableOpacity>
             <TouchableOpacity
               style={{
                 padding: 5,
                 marginLeft: 20,
-                marginTop: 10
+                marginTop: 10,
               }}
               onPress={() => {
-                setWaterGoal(waterGoal + 200)
+                setWaterGoal(waterGoal + 200);
               }}
             >
-              <Ionicons name="add-circle" size={26 * 2} color="#2389da" />
+              <Ionicons name="add-circle" size={26 * 2} color={primaryColor} />
             </TouchableOpacity>
           </View>
         </View>
       </View>
+
+      {/* <BannerAd
+        unitId="ca-app-pub-5593915309329672/3986228611"
+        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+        requestOptions={{
+          requestNonPersonalizedAdsOnly: true,
+        }}
+      /> */}
 
       {/* ProgressView */}
       <View
@@ -255,7 +440,7 @@ export default function App() {
           <Animated.View
             style={{
               height: progressPercent,
-              backgroundColor: "#5abcd8",
+              backgroundColor: primaryColor,
               borderRadius: 40,
             }}
           />
@@ -291,6 +476,7 @@ export default function App() {
           {amounts.map((amount) => {
             return (
               <AddRemoveButton
+                primaryColor={primaryColor}
                 key={"add" + amount}
                 amount={amount}
                 value={waterDrank}
@@ -306,6 +492,7 @@ export default function App() {
           {amounts.map((amount) => {
             return (
               <AddRemoveButton
+                primaryColor={primaryColor}
                 key={"remove" + amount}
                 amount={amount}
                 value={waterDrank}
@@ -322,73 +509,33 @@ export default function App() {
           paddingVertical: 20,
           flexDirection: "row",
           width: "90%",
-          justifyContent: "space-between",
+          justifyContent: "center",
         }}
       >
         <TouchableOpacity
           style={[
             styles.notificationButton,
             {
-              backgroundColor: "#74ccf4",
+              backgroundColor: isNotitications ? primaryColor : "red",
             },
           ]}
-          onPress={() => scheduleNotification()}
+          onPress={() => setShowModal(true)}
         >
           <Text style={styles.notificationText}>Agendar notificação</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={[
             styles.notificationButton,
             {
               backgroundColor: "red",
             },
           ]}
-          onPress={async () =>
-            await Notifications.cancelAllScheduledNotificationsAsync()
-          }
+          onPress={}
         >
           <Text style={styles.notificationText}>Cancelar notificações</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "space-around",
-  },
-  progressBarContainer: {
-    borderRadius: 40,
-    borderWidth: 1,
-    width: 40,
-    height: 300,
-    justifyContent: "flex-end",
-  },
-  waterButtonsContainer: {
-    flexDirection: "row",
-    paddingVertical: 10,
-    width: "90%",
-    justifyContent: "space-around",
-  },
-  waterGoalContainer: {
-    padding: 50,
-    alignItems: "center",
-  },
-  blueText: {
-    color: "#1ca3ec",
-    fontWeight: "600",
-  },
-  grayText: { color: "#323033", fontWeight: "600" },
-  notificationButton: {
-    height: 50,
-    borderRadius: 20,
-    justifyContent: "center",
-    padding: 10,
-  },
-  notificationText: { color: "white", fontWeight: "500", fontSize: 16 },
-});
