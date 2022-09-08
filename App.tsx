@@ -65,7 +65,7 @@ async function scheduleNotification() {
       trigger: {
         repeats: true,
         // seconds: 10
-        seconds: (60 * 60) / 2,
+        seconds: 1800,
       },
     }).then((notification) => {
       console.log("notification", notification);

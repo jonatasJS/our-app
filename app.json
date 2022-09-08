@@ -22,8 +22,8 @@
       "versionCode": 1,
       "package": "com.nextrockt.ourapp",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icons/newIconNoBG.png",
-        "backgroundColor": "#1E3B8100"
+        "foregroundImage": "./assets/icons/newIcon.png",
+        "backgroundColor": "#fff"
       }
     },
     "web": {
