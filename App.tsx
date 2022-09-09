@@ -119,7 +119,6 @@ export default function App() {
         }
       });
       await getData("@notification", (notification) => {
-        Alert.alert("notification", notification);
         if (notification === "true") {
           setIdNotifications(true);
         } else {
