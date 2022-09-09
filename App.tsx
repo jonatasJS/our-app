@@ -292,8 +292,8 @@ export default function App() {
 
       {/* Modal */}
       <Modal
-        animationIn={"slideInLeft"}
-        animationOut={"slideOutRight"}
+        animationIn={"bounceIn"}
+        animationOut={"fadeOut"}
         animationInTiming={500}
         animationOutTiming={500}
         backdropTransitionInTiming={600}
