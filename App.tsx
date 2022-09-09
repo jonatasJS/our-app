@@ -51,7 +51,6 @@ async function scheduleNotification() {
     await Notifications.scheduleNotificationAsync({
       content: {
         title: "Beba água!",
-        subtitle: "🚰 Não se esqueça de beber água",
         body: "🤪 É hora de beber água",
         sound: true,
         vibrate: [0, 250, 0, 250, 0, 250],
