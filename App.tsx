@@ -113,6 +113,9 @@ export default function App() {
       await Update.checkForUpdateAsync().then(async (update) => {
         if (update.isAvailable) {
           await Update.fetchUpdateAsync().then(async () => {
+            await Notifications.cancelAllScheduledNotificationsAsync();
+            setIdNotifications(false);
+            await storeData("false", "@notifications");
             await Update.reloadAsync();
           });
         }
