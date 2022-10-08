@@ -20,6 +20,8 @@ import * as Update from "expo-updates";
 import Modal from "react-native-modal";
 import moment from "moment";
 
+import styles from "./styles";
+
 import { AddRemoveButton } from "./components/AddRemoveButton";
 import { StatusBar } from "expo-status-bar";
 
@@ -202,87 +204,6 @@ export default function App() {
     }
   }, [waterDrank, isGoalAchieved, waterGoal]);
 
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: "#fff",
-      alignItems: "center",
-      justifyContent: "space-around",
-    },
-    progressBarContainer: {
-      borderRadius: 40,
-      borderWidth: 1,
-      width: 40,
-      height: 300,
-      justifyContent: "flex-end",
-    },
-    centeredView: {
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: "rgba(0,0,0,0.5)",
-    },
-    modalView: {
-      margin: 20,
-      backgroundColor: "white",
-      borderRadius: 20,
-      padding: 35,
-      alignItems: "center",
-      // shadowColor: "#000",
-      // shadowOffset: {
-      //   width: 0,
-      //   height: 2,
-      // }
-    },
-    modalText: {
-      marginBottom: 30,
-      textAlign: "center",
-    },
-    modalButtons: {
-      flexDirection: "row",
-      justifyContent: "space-evenly",
-      width: "50%",
-    },
-    button: {
-      height: 40,
-      borderRadius: 10,
-      justifyContent: "center",
-      alignItems: "center",
-      textAlign: "center",
-      paddingTop: 5,
-      paddingBottom: 5,
-      paddingLeft: 20,
-      paddingRight: 20,
-    },
-    buttonText: {
-      color: "#fff",
-      fontWeight: "bold",
-      textAlign: "center",
-    },
-    waterButtonsContainer: {
-      flexDirection: "row",
-      paddingVertical: 10,
-      width: "90%",
-      justifyContent: "space-around",
-    },
-    waterGoalContainer: {
-      padding: 50,
-      alignItems: "center",
-    },
-    blueText: {
-      color: primaryColor,
-      fontWeight: "600",
-    },
-    grayText: { color: "#323033", fontWeight: "600" },
-    notificationButton: {
-      height: 50,
-      borderRadius: 20,
-      justifyContent: "center",
-      padding: 10,
-    },
-    notificationText: { color: "white", fontWeight: "500", fontSize: 16 },
-  });
-
   const periodRef = useRef(new Animated.Value(-60)).current;
   const floatinRef = useRef(new Animated.Value(0)).current;
 
@@ -460,8 +381,7 @@ export default function App() {
               flexDirection: "row",
               width: "70%",
               height: "5%",
-              marginBottom: -90,
-              marginTop: 10,
+              marginTop: 25,
               backgroundColor: "#fff",
               borderRadius: 20,
               shadowColor: "#000",
@@ -507,6 +427,7 @@ export default function App() {
                 : "Sáb"}
             </Text>
           </View>
+
           <Animated.View
             style={{
               width: "50%",
@@ -515,10 +436,13 @@ export default function App() {
               alignItems: "center",
               position: "relative",
               backgroundColor: "#fff",
-              borderRadius: 10,
-              marginTop: -45,
+              borderTopLeftRadius: 0,
+              borderTopRightRadius: 0,
+              borderBottomLeftRadius: 10,
+              borderBottomRightRadius: 10,
+              marginTop: -40,
+              marginBottom: -90,
               translateY: periodRef,
-              marginBottom: -120,
               zIndex: 1,
               shadowColor: "#000",
               shadowOffset: {
@@ -536,10 +460,7 @@ export default function App() {
           {/* Water Goal */}
           <View
             style={[
-              styles.waterGoalContainer,
-              {
-                marginBottom: -50,
-              },
+              styles.waterGoalContainer
             ]}
           >
             <Text
@@ -621,14 +542,6 @@ export default function App() {
             </View>
           </View>
 
-          {/* <BannerAd
-  unitId="ca-app-pub-5593915309329672/3986228611"
-  size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-  requestOptions={{
-    requestNonPersonalizedAdsOnly: true,
-  }}
-/> */}
-
           {/* ProgressView */}
           <View
             style={{
@@ -636,6 +549,7 @@ export default function App() {
               width: "90%",
               justifyContent: "space-around",
               alignItems: "center",
+              height: "10%",
             }}
           >
             {/* Water You've Drunk Label */}
@@ -665,7 +579,7 @@ export default function App() {
                   styles.blueText,
                   {
                     fontSize: 33,
-                    right: -120,
+                    right: -60,
                     position: "absolute",
                     marginLeft: -120,
                     textAlign: "center",
